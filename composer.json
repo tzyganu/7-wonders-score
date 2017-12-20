@@ -27,7 +27,7 @@
     "autoload": {
         "psr-0": {
             "": "src/",
-            "Wonders": "generated-classes/Wonders"
+            "Wonders": "generated-classes"
         }
     },
     "extra": {
