@@ -1,0 +1,39 @@
+{% extends "layout.html.twig" %}
+{% block head %}
+{% include 'misc/datatable.html.twig' %}
+{% endblock %}
+{% block content %}
+    <fieldset>
+        <legend>{{ data.title }}</legend>
+        <div class="form-group">
+            <label for="game-name">{{ data.label }}</label>
+            <div class="table-responsive">
+                <table class="table data-table" id="grid">
+                    <thead>
+                        <tr>
+                            {% for column in data.columns  %}
+                                <td>
+                                    {% if column.icon_class is defined %}
+                                        <span class="{{ column.icon_class }}"></span>
+                                        {{ column.label }}
+                                    {% else %}
+                                        {{ column.label }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data.rows  %}
+                        <tr>
+                            {% for cell in row %}
+                                <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </fieldset>
+{% endblock %}

@@ -1,0 +1,85 @@
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <div class="btn-group">
+                    <a class="btn btn-secondary fa fa-home" href="{{ url('homepage') }}" role="button" id="home">
+                        Home
+                    </a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group">
+                    <a class="btn btn-secondary dropdown-toggle  fa fa-id-card" href="#" role="button" id="games" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Games
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="{{ url('game/list') }}">Game list</a>
+                        <a class="nav-link" href="{{ url('game/new') }}">New Game</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group">
+                    <a class="btn btn-secondary dropdown-toggle fa fa-user" href="#" role="button" id="players" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Players
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="{{ url('player/list') }}">Players</a>
+                        <a class="nav-link" href="{{ url('player/new') }}">New Player</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group">
+                    <a class="btn btn-secondary dropdown-toggle fa fa-exclamation-triangle" href="#" role="button" id="wonders" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Wonders
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="{{ url('wonder/list') }}">Wonders</a>
+                        <a class="nav-link" href="{{ url('wonder/new') }}">New Wonder</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group">
+                    <a class="btn btn-secondary dropdown-toggle fa fa-superpowers" href="#" role="button" id="categories" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Score categories
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="{{ url('category/list') }}">Score Categories</a>
+                        <a class="nav-link" href="{{ url('category/new') }}">New Score Category</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group">
+                    <a class="btn btn-secondary dropdown-toggle fa fa-table" href="#" role="button" id="reports" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Reports
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="{{ url('report/player') }}">Player stats</a>
+                        <a class="nav-link" href="{{ url('report/wonder') }}">Wonder stats</a>
+                        <a class="nav-link" href="{{ url('report/side') }}">Side stats</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group">
+                    {% if session.get('user') %}
+                        <a class="btn btn-secondary fa fa-sign-out" href="{{ url('logout') }}" role="button" id="logout">
+                            Logout, {{ session.get('user').username }}
+                        </a>
+                    {% else %}
+                        <a class="btn btn-secondary fa fa-sign-in" href="{{ url('login') }}" role="button" id="login">
+                            Login
+                        </a>
+                    {% endif %}
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>

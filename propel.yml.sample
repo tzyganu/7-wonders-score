@@ -1,0 +1,10 @@
+propel:
+    database:
+        connections:
+            default:
+                adapter: mysql
+                dsn: mysql:host={dbhost};port={dbport};dbname={dbname}
+                user: {dbuser}
+                password: {dbpass}
+                settings:
+                    charset: utf8

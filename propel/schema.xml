@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" namespace="Wonders" defaultPhpNamingMethod="underscore">
+    <table name="player" phpName="Player" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
+        <index name="IDX_PLAYER_NAME">
+            <index-column name="name"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="wonder" phpName="Wonder" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
+        <index name="IDX_WONDER_NAME">
+            <index-column name="name"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="category" phpName="Category" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
+        <column name="sort_order" phpName="SortOrder" type="INTEGER" size="10" required="false" />
+        <column name="icon_class" phpName="IconClass" type="VARCHAR" size="100" required="false"/>
+        <column name="optional" phpName="Optional" type="TINYINT" size="4"/>
+        <index name="IDX_CATEGORY_NAME">
+            <index-column name="name"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="game" phpName="Game" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="date" phpName="Date" type="DATE" required="true"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" size="10" />
+        <index name="IDX_CATEGORY_NAME">
+            <index-column name="name"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="user" phpName="User" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="username" phpName="Username" type="VARCHAR" size="45" required="true"/>
+        <column name="password" phpName="Password" type="VARCHAR" size="255" required="true"/>
+        <column name="active" phpName="Active" type="TINYINT" size="4" default="1" />
+        <unique name="USER_USERNAME_UNIQUE">
+            <unique-column name="username"/>
+        </unique>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="game_category" phpName="GameCategory" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="game_id" phpName="GameId" type="INTEGER" size="10" required="true"/>
+        <column name="category_id" phpName="CategoryId" type="INTEGER" size="10" required="true"/>
+        <index name="IDX_GAME_WONDER_GAME_ID">
+            <index-column name="game_id"/>
+        </index>
+        <index name="IDX_GAME_CATEGORY_ID">
+            <index-column name="category_id"/>
+        </index>
+        <unique name="GAME_CATEGORY_UNIQUE">
+            <unique-column name="game_id"/>
+            <unique-column name="category_id"/>
+        </unique>
+        <foreign-key foreignTable="game" name="FK_GAME_CATEGORY_GAME_ID">
+            <reference local="game_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="category" name="FK_GAME_CATEGORY_CATEGORY_ID">
+            <reference local="category_id" foreign="id"/>
+        </foreign-key>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="game_player" phpName="GamePlayer" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="game_id" phpName="GameId" type="INTEGER" size="10" required="true"/>
+        <column name="player_id" phpName="PlayerId" type="INTEGER" size="10" required="true"/>
+        <column name="wonder_id" phpName="WonderId" type="INTEGER" size="10" required="true"/>
+        <column name="side" phpName="Side" type="VARCHAR" size="2" required="true"/>
+        <column name="points" phpName="Points" type="INTEGER" size="10" required="true"/>
+        <column name="place" phpName="Place" type="INTEGER" size="10" required="true"/>
+        <index name="IDX_GAME_WONDER_GAME_ID">
+            <index-column name="game_id"/>
+        </index>
+        <index name="IDX_GAME_PLAYER_ID">
+            <index-column name="player_id"/>
+        </index>
+        <index name="IDX_GAME_WONDER_WONDER_ID">
+            <index-column name="wonder_id"/>
+        </index>
+        <unique name="GAME_PLAYER_UNIQUE">
+            <unique-column name="game_id"/>
+            <unique-column name="player_id"/>
+        </unique>
+        <foreign-key foreignTable="game" name="FK_GAME_PLAYER_GAME_ID">
+            <reference local="game_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="player" name="FK_GAME_PLAYER_PLAYER_ID">
+            <reference local="player_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="wonder" name="FK_GAME_PLAYER_WONDER_ID">
+            <reference local="wonder_id" foreign="id"/>
+        </foreign-key>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="score" phpName="Score" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="game_id" phpName="GameId" type="INTEGER" size="10" required="true"/>
+        <column name="player_id" phpName="PlayerId" type="INTEGER" size="10" required="true"/>
+        <column name="category_id" phpName="CategoryId" type="INTEGER" size="10" required="true"/>
+        <column name="value" phpName="Value" type="INTEGER" size="10" required="true"/>
+        <index name="IDX_SCORE_GAME_ID">
+            <index-column name="game_id"/>
+        </index>
+        <index name="IDX_SCORE_PLAYER_ID">
+            <index-column name="player_id"/>
+        </index>
+        <index name="IDX_SCORE_CATEGORY_ID">
+            <index-column name="category_id"/>
+        </index>
+        <unique name="SCORE_GAME_CATEGORY_UNIQUE">
+            <unique-column name="game_id"/>
+            <unique-column name="player_id"/>
+            <unique-column name="category_id"/>
+        </unique>
+        <foreign-key foreignTable="game" name="FK_SCORE_GAME_ID">
+            <reference local="game_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="wonder" name="FK_SCORE_CATEGORY_ID">
+            <reference local="category_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="player" name="FK_SCORE_PLAYER_ID">
+            <reference local="player_id" foreign="id"/>
+        </foreign-key>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+</database>

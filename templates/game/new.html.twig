@@ -1,0 +1,71 @@
+{% extends "layout.html.twig" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+    <fieldset>
+        <legend>New game</legend>
+        <form id="score-form" action="{{ url('game/save') }}" method="post">
+            <div class="form-group">
+                <label for="game-date">Game Date</label>
+                <input type="text" class="form-control" id="game-date" name="game_date" value="{{ data.game_date }}" style="width:200px" />
+            </div>
+            <div class="form-group">
+                <label for="game-name">Players</label>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="player-table">
+                        <tbody>
+                            <tr id="players">
+                                <td></td>
+                                {% for category in data.categories  %}
+                                    <td>
+                                        <span class="{{ category.icon_class }}"></span>
+                                        {{ category.name }}
+                                        {% if category.optional %}
+                                            <br/>
+                                            <input type="checkbox" id="enabled_category_{{ category.id }}" class="skip-category" value="{{ category.id}}" name="skip_category[]">
+                                            <label for="enabled_category_{{ category.id }}">Disable</label>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                                <td><span class="fa fa-plus"></span> Total</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" id="add-player">Add player</button>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </fieldset>
+    <script type="text/javascript">
+
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var form = document.getElementById('score-form');
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            }, false);
+            $('#player-table').game({
+                'addPlayerTrigger': '#add-player',
+                'categories': {{ data.categories|json_encode|raw }},
+                'registeredPlayers': {{ data.existing_players|json_encode|raw }},
+                'wonders': {{ data.wonders|json_encode|raw }},
+                'sides': {{ data.sides|json_encode|raw }}
+            });
+            $('#game-date').datepicker();
+        })();
+    </script>
+{% endblock %}

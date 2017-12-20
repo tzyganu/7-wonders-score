@@ -1,0 +1,10 @@
+/vendor/
+/generated-conf/
+/var/
+/generated-classes/Wonders/Base/
+/generated-classes/Wonders/Map/
+/generated-sql/
+propel.yml
+propel.yml.dist
+/.idea/
+

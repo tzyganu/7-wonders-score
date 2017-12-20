@@ -1,0 +1,33 @@
+{% extends "layout.html.twig" %}
+{% block head %}
+    {% include 'misc/datatable.html.twig' %}
+{% endblock %}
+{% block content %}
+    <div class="pull-right">
+        <a href="{{ url('wonder/new')}}" class="btn btn-primary">Add new Wonder</a>
+    </div>
+    <table class="table data-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if data.wonders|length > 0 %}
+                {% for wonder in data.wonders %}
+                <tr>
+                    <td>{{ wonder.id }}</td>
+                    <td>{{ wonder.name }}</td>
+                    <td><a href="{{ url('wonder/new', {'id': wonder.id})}}">Edit</a></td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td align="center" colspan="3">No Wonders so far.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+{% endblock %}

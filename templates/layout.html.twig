@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>7 Wonders {{ page_title|default('') }}</title>
+
+        <link href="{{ asset('css/main.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('bootstrap/css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('jquery-ui-1.12.1/css/jquery-ui.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('jquery-ui-1.12.1/css/theme.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('fa4.7/css/font-awesome.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('select2/select2.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('select2/select2-bootstrap.css') }}" type="text/css" />
+        <script type="text/javascript" src="{{ asset('jquery-ui-1.12.1/external/jquery/jquery.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('jquery-ui-1.12.1/jquery-ui.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bootstrap/js/bootstrap.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('select2/select2.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('game.js') }}"></script>
+        {% block head %}{% endblock %}
+    </head>
+    <body class="{{ body_class|default('body') }}">
+        <div class="container">
+            {% include 'misc/nav.html.twig' with {'session': session} %}
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>

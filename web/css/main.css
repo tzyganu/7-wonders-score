@@ -1,0 +1,25 @@
+.game-new .container {
+    width: 1350px;
+}
+.game-view .container {
+    width: 1350px;
+}
+.category-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+.category-icon-yellow {
+    background-color: yellow;
+}
+
+.category-icon-blue {
+    background-color: blue;
+}
+
+.category-icon-purple {
+    background-color: purple;
+}
+.category-icon-black {
+    background-color: black;
+}

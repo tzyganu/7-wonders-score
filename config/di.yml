@@ -1,0 +1,8 @@
+playerQueryFactory: \Factory\PlayerQuery
+categoryQueryFactory: \Factory\CategoryQuery
+wonderQueryFactory: \Factory\WonderQuery
+gameQueryFactory: \Factory\GameQuery
+userQueryFactory: \Factory\UserQuery
+gamePlayerQueryFactory: \Factory\GamePlayerQuery
+sideModel: \Model\Side
+hash: \Model\Hash
