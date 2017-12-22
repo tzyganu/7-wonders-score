@@ -16,17 +16,8 @@ This is a small "quick and dirty" web app to keep a history of scores for the bo
 3. Clone this repo: `git clone https://github.com/tzyganu/7-wonders-score.git .`  
 4. Create a database. Let's call it `wondersdb`. (feel free to change the name)  
 5. Import the file `db/install.sql` into your newly created database.  
-6. Run `composer install`  
-7. copy the file `propel.yml.sample` into `propel.yml` and replace following placeholders (curly brackets should be removed also):
-   - {dbhost}: your db host (probably `localhost`)
-   - {dbport}: your mysql port (probably 3306)
-   - {dbname}: your database name (`wondersdb` in the example above)  
-   - {dbuser}: a username that has access to the database listed above
-   - {dbpass}: the password of the user that can access the database listed above.  
-8. Copy the file `propel.yml.dist.sample` to `propel.yml.dist` and replace the placeholder `{ROOT_DIR}` with the absolute path to your project. probably `/var/www/html/wonders` if you followed the example above.  
-9. Create an admin user. For now you will have to insert one into your db. `INSERT INTO user SET username="your-username", password="sha1 of your password", active=1`
-10. Generate the ORM (propel) classes. Run in the command line `vendor/bin/propel model:build`.  
-11. Generate a PHP version of the ORM config. Run this `vendor/bin/propel config:convert`.
+6. Run `composer install` 
+7. Run `php bin/console app:install` and fill in the fields you are required to fill in and hit submit.
 12. You should be done. Try it in the browser.  
 
 ### How to use
