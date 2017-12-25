@@ -6,12 +6,15 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Filesystem\Filesystem;
 
 class Install extends Command
 {
     const PROPEL_FILE = "propel.yml";
     const PROPEL_DIST_FILE = "propel.yml.dist";
+
+    /**
+     * configure the command
+     */
     protected function configure()
     {
         $this->setName("app:install")
@@ -49,22 +52,28 @@ class Install extends Command
             ],
             '{dbpass}' => [
                 'question' => 'Database Password: ',
-                'default' => "root",
+                'default' => "",
                 'hidden' => true
             ],
             '{dbname}' => [
                 'question' => 'Database Name: ',
-                'default' => "",
+                'default' => "wonders",
             ],
         ];
     }
 
+    /**
+     * additional commands to run on install
+     * order is important
+     * @return array
+     */
     private function getCommandsToRun()
     {
         return [
-            'vendor/bin/propel model:build',
-            'vendor/bin/propel config:convert',
-            'vendor/bin/propel migration:up',
+            'vendor/bin/propel model:build', //build propel classes
+            'vendor/bin/propel config:convert', //build propel config (PHP version)
+            'vendor/bin/propel migration:up', //install db
+            'bin/console user:create' //create admin user
 
         ];
     }
@@ -86,7 +95,7 @@ class Install extends Command
             '{ROOT_DIR}' => dirname(dirname(dirname(__DIR__))),
         ];
         foreach ($this->getQuestions() as $key => $question) {
-            $q = new Question($question['question'], $question['default']);
+            $q = new Question($question['question']. '(default: '.$question['default'].')', $question['default']);
             if (isset($question['hidden']) && $question['hidden']) {
                 $q->setHidden(true);
                 $q->setHiddenFallback(true);

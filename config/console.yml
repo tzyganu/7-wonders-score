@@ -1,0 +1,3 @@
+app-install: \Console\Command\Install
+create-user: \Console\Command\CreateUser
+

@@ -1,7 +1,7 @@
 # 7 wonders score
 
 ### Description  
-This is a small "quick and dirty" web app to keep a history of scores for the board game [7 wonders](https://en.wikipedia.org/wiki/7_Wonders_(board_game)).  
+This is a small "quick and dirty" (working to clean it up) web app to keep a history of scores for the board game [7 wonders](https://en.wikipedia.org/wiki/7_Wonders_(board_game)).  
 
 ### System Requirements:  
 1. PHP 7+  
@@ -9,21 +9,18 @@ This is a small "quick and dirty" web app to keep a history of scores for the bo
 3. Only tested on ubuntu.
 
 ### How to install:  
-(some manual work is involved. There is no pretty installer for now)  
 
-1. Create a folder on your server. Let's call it `wonders`. (feel free to change the name)    
-2. Navigate to that folder.  
-3. Clone this repo: `git clone https://github.com/tzyganu/7-wonders-score.git .`  
-4. Create a database. Let's call it `wondersdb`. (feel free to change the name)  
-5. Import the file `db/install.sql` into your newly created database.  
-6. Run `composer install` 
-7. Run `php bin/console app:install` and fill in the fields you are required to fill in and hit submit.
-12. You should be done. Try it in the browser.  
+1. Clone this repo:  
+2. Create a database.  
+3. Run `composer install` 
+4. Run `php bin/console app:install` and fill in the fields you are required to fill in and hit submit.
+5. There might be some issues with the folder permissions for `var`. Make it writable if it happens.
+6. Enjoy.  
 
 ### How to use
 You can manage the players, wonders and scoring categories from the backend.  
 The install sql comes with the standard wonders and scoring categories and the ones from the Leaders and Cities extension packs.  
-You can add more if needed. The scoring categories that come from the extension packs can be marked as disabled when sumitting a score.  
+You can add more if needed. The scoring categories that come from the extension packs can be marked as disabled when submitting a score.  
 There is no "delete" action so far for anything and no "edit" for a submitted game. If you screw up, you clean it up manually.  
 
 ### Licence:
