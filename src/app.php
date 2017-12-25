@@ -7,7 +7,9 @@ use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\HttpFragmentServiceProvider;
 
 define('PATH_ROOT', dirname(__DIR__));
-require_once '../generated-conf/config.php';
+if (file_exists('../generated-conf/config.php')) {
+    require_once '../generated-conf/config.php';
+}
 $app = new Application();
 $app->register(new ServiceControllerServiceProvider());
 $app->register(new AssetServiceProvider());
