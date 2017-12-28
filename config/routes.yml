@@ -1,241 +1,224 @@
+home:
+  controller: \Controller\IndexController
+  dependencies:
+    - request
+    - session
+    - menuBuilder
+    - twig
+  method: get
+  page_title: Dashboard
+  bind: /
+#PLAYERS
 player_list:
   controller: \Controller\Player\ListPlayer
   dependencies:
     - request
-    - playerQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: player/list.html.twig
   page_title: Players List
   bind: player/list
-  api: true
-  web: true
 player_new:
   controller: \Controller\Player\EditPlayer
   dependencies:
     - request
-    - playerQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: player/edit.html.twig
   page_title: Add new player
   bind: player/new
-  web: true
 player_edit:
   controller: \Controller\Player\EditPlayer
   dependencies:
     - request
-    - playerQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: player/edit.html.twig
   page_title: Edit Player
   bind: player/edit
-  api: true
-  web: true
 player_save:
   controller: \Controller\Player\SavePlayer
   dependencies:
     - request
-    - playerQueryFactory
+    - session
   method: post
-  redirect: /player/list
   bind: player/save
-  api: true
-  web: true
 
+#SCORE CATEGORIES
 category_list:
   controller: \Controller\Category\ListCategory
   dependencies:
     - request
-    - categoryQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: category/list.html.twig
   page_title: Score categories list
   bind: category/list
-  api: true
-  web: true
+
 category_new:
   controller: \Controller\Category\EditCategory
   dependencies:
     - request
-    - categoryQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: category/edit.html.twig
   page_title: Add new score category
   bind: category/new
-  web: true
 category_edit:
   controller: \Controller\Category\EditCategory
   dependencies:
     - request
-    - categoryQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: category/edit.html.twig
   page_title: Edit score category
   bind: category/edit
-  api: true
-  web: true
 category_save:
   controller: \Controller\Category\SaveCategory
   dependencies:
     - request
-    - categoryQueryFactory
+    - session
   method: post
   redirect: /category/list
   bind: category/save
-  api: true
-  web: true
-
+# WONDERS
 wonder_list:
   controller: \Controller\Wonder\ListWonder
   dependencies:
     - request
-    - wonderQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: wonder/list.html.twig
   page_title: Wonders List
   bind: wonder/list
-  api: true
-  web: true
 wonder_new:
   controller: \Controller\Wonder\EditWonder
   dependencies:
     - request
-    - wonderQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: wonder/edit.html.twig
   page_title: Add new Wonder
   bind: wonder/new
-  web: true
 wonder_edit:
   controller: \Controller\Wonder\EditWonder
   dependencies:
     - request
-    - wonderQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: wonder/edit.html.twig
   page_title: Edit Wonder
   bind: wonder/edit
-  api: true
-  web: true
 wonder_save:
   controller: \Controller\Wonder\SaveWonder
   dependencies:
     - request
-    - wonderQueryFactory
+    - session
   method: post
-  redirect: /wonder/list
   bind: wonder/save
-  api: true
-  web: true
+
+# GAME
 game_list:
   controller: \Controller\Game\ListGame
   dependencies:
     - request
-    - gameQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: game/list.html.twig
   page_title: Games list
   bind: game/list
-  api: true
-  web: true
 game_view:
   controller: \Controller\Game\ViewGame
   dependencies:
     - request
-    - gameQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: grid.html.twig
   page_title: View Game Scores
   bind: game/view
-  web: true
 game_new:
   controller: \Controller\Game\NewGame
   dependencies:
     - request
-    - playerQueryFactory
-    - wonderQueryFactory
-    - categoryQueryFactory
-    - sideModel
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: game/new.html.twig
   page_title: Add new game score
   bind: game/new
-  web: true
-  api: true
 game_save:
   controller: \Controller\Game\SaveGame
   dependencies:
     - request
-    - gameQueryFactory
     - session
-    - categoryQueryFactory
   method: post
   redirect: /game/list
   bind: game/save
-  web: true
-  api: true
 login:
   controller: \Controller\Login\Index
   template: login/index.html.twig
   dependencies:
     - request
     - session
+    - menuBuilder
+    - twig
   method: get
   bind: login
-  web: true
 login_post:
   controller: \Controller\Login\Post
   dependencies:
     - request
     - session
     - hash
-    - userQueryFactory
   method: post
-  redirect: /
   bind: login/post
-  web: true
 logout:
   controller: \Controller\Login\Logout
   dependencies:
     - request
     - session
   method: get
-  redirect: /
   bind: logout
-  web: true
+
+#REPORTS
 report_player:
   controller: \Controller\Report\Stats\Player
   dependencies:
     - request
-    - playerQueryFactory
-    - gamePlayerQueryFactory
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: grid.html.twig
   page_title: Players stats
   bind: report/player
-  web: true
-  api: false
 report_wonder:
   controller: \Controller\Report\Stats\Wonder
   dependencies:
     - request
-    - wonderQueryFactory
-    - gamePlayerQueryFactory
-    - sideModel
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: grid.html.twig
-  page_title: wonder stats
+  page_title: Wonder Stats
   bind: report/wonder
-  web: true
-  api: false
 report_side:
   controller: \Controller\Report\Stats\Side
   dependencies:
     - request
-    - gamePlayerQueryFactory
-    - sideModel
+    - session
+    - menuBuilder
+    - twig
   method: get
-  template: grid.html.twig
   page_title: Side stats
   bind: report/side
-  web: true
-  api: false

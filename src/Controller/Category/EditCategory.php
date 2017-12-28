@@ -2,20 +2,34 @@
 namespace Controller\Category;
 
 use Controller\AuthInterface;
-use Propel\Runtime\Map\TableMap;
+use Controller\OutputController;
+use Wonders\Category;
+use Wonders\CategoryQuery;
 
-class EditCategory extends CategoryController implements AuthInterface
+class EditCategory extends OutputController implements AuthInterface
 {
+    /**
+     * @var string
+     */
+    protected $selectedMenu = 'categories';
+    /**
+     * @var string
+     */
+    protected $template = 'category/edit.html.twig';
+
+    /**
+     * @return string
+     */
     public function execute()
     {
         $id = $this->request->get('id');
         if ($id) {
-            $category = $this->categoryQueryFactory->create()
+            $category = CategoryQuery::create()
                 ->findOneById($id);
             if ($category) {
-                return ['category' => $category->toArray(TableMap::TYPE_FIELDNAME)];
+                return $this->render(['category' => $category]);
             }
         }
-        return ['category' => []];
+        return $this->render(['category' => new Category()]);
     }
 }

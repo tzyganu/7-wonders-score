@@ -1,0 +1,60 @@
+dashboard:
+  url:
+  label: Dashboard
+  icon: fa fa-dashboard
+games:
+  label: Games
+  icon: fa fa-id-card
+  children:
+    list:
+      label: Game List
+      url: game/list
+    new:
+      label: New Game
+      url: game/new
+players:
+  label: Players
+  icon: fa fa-user
+  children:
+    list:
+      label: Player List
+      url: player/list
+    new:
+      label: New Player
+      url: player/edit
+wonders:
+  label: Wonders
+  icon: glyphicon glyphicon-triangle-top
+  children:
+    list:
+      label: Wonder List
+      url: wonder/list
+    new:
+      label: New Wonder
+      url: wonder/edit
+categories:
+  label: Score Categories
+  icon: fa fa-superpowers
+  children:
+    list:
+      label: Score Category List
+      url: category/list
+    new:
+      label: New Score Category
+      url: category/edit
+reports:
+  label: Reports
+  icon: fa fa-table
+  children:
+    player:
+      label: Player Stats
+      url: report/player
+    wonder:
+      label: Wonder Stats
+      url: report/wonder
+    side:
+      label: Side Stats
+      url: report/side
+
+
+

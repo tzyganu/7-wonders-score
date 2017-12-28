@@ -9,32 +9,13 @@ use Wonders\GamePlayer;
 class Side extends Stats
 {
     /**
-     * @var SideModel
-     */
-    protected $sideModel;
-
-    /**
-     * Wonder constructor.
-     * @param Request $request
-     * @param GamePlayerQuery $gamePlayerQueryFactory
-     * @param SideModel $sideModel
-     */
-    public function __construct(
-        Request $request,
-        GamePlayerQuery $gamePlayerQueryFactory,
-        SideModel $sideModel
-    ) {
-        $this->sideModel = $sideModel;
-        parent::__construct($request, $gamePlayerQueryFactory);
-    }
-
-    /**
      * @return array
      */
     protected function initRows()
     {
         $rows = [];
-        $sides = $this->sideModel->getSides();
+        $sideModel = new SideModel();
+        $sides = $sideModel->getSides();
         foreach ($sides as $side) {
             $rows[$side['id']] = [
                 'name' => $side['name'],
@@ -75,13 +56,4 @@ class Side extends Stats
     {
         return 'Side Stats';
     }
-
-    /**
-     * @return string
-     */
-    protected function getGridLabel()
-    {
-        return 'Side Stats';
-    }
-
 }

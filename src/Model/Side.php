@@ -5,6 +5,10 @@ class Side
 {
     const SIDE_A = 'A';
     const SIDE_B = 'B';
+
+    /**
+     * @return array
+     */
     public function getSides()
     {
         return [

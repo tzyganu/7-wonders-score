@@ -2,24 +2,34 @@
 namespace Controller\Player;
 
 use Controller\AuthInterface;
-use Propel\Runtime\Map\TableMap;
+use Controller\OutputController;
 use Wonders\Player;
+use Wonders\PlayerQuery;
 
-class EditPlayer extends PlayerController implements AuthInterface
+class EditPlayer extends OutputController implements AuthInterface
 {
     /**
-     * @return array|Player
+     * @var string
+     */
+    protected $selectedMenu = 'players';
+    /**
+     * @var string
+     */
+    protected $template = 'player/edit.html.twig';
+
+    /**
+     * @return string
      */
     public function execute()
     {
         $id = $this->request->get('id');
         if ($id) {
-            $player = $this->playerQueryFactory->create()
+            $player = PlayerQuery::create()
                 ->findOneById($id);
             if ($player) {
-                return ['player' => $player->toArray(TableMap::TYPE_FIELDNAME)];
+                return $this->render(['player' => $player]);
             }
         }
-        return ['player' => []];
+        return $this->render(['player' => new Player()]);
     }
 }

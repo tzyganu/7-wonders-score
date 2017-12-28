@@ -23,3 +23,6 @@
 .category-icon-black {
     background-color: black;
 }
+.user-panel > .info > p {
+    margin-bottom: 6px;
+}

@@ -1,49 +1,21 @@
 <?php
 namespace Controller\Report\Stats;
 
-use Factory\GamePlayerQuery;
-use Factory\WonderQuery;
 use Model\Side;
-use Symfony\Component\HttpFoundation\Request;
 use Wonders\GamePlayer;
+use Wonders\WonderQuery;
 
 class Wonder extends Stats
 {
-    /**
-     * @var WonderQuery
-     */
-    protected $wonderQueryFactory;
-    /**
-     * @var Side
-     */
-    protected $sideModel;
-
-    /**
-     * Wonder constructor.
-     * @param Request $request
-     * @param WonderQuery $wonderQueryFactory
-     * @param GamePlayerQuery $gamePlayerQueryFactory
-     * @param Side $sideModel
-     */
-    public function __construct(
-        Request $request,
-        WonderQuery $wonderQueryFactory,
-        GamePlayerQuery $gamePlayerQueryFactory,
-        Side $sideModel
-    ) {
-        $this->wonderQueryFactory = $wonderQueryFactory;
-        $this->sideModel = $sideModel;
-        parent::__construct($request, $gamePlayerQueryFactory);
-    }
-
     /**
      * @return array
      */
     protected function initRows()
     {
-        $wonders = $this->wonderQueryFactory->create()->find();
+        $wonders = WonderQuery::create()->find();
         $rows = [];
-        $sides = $this->sideModel->getSides();
+        $sideModel = new Side();
+        $sides = $sideModel->getSides();
         foreach ($wonders as $wonder) {
             foreach ($sides as $side) {
                 $rows[$wonder->getId() . '_'.$side['id']] = [
@@ -86,13 +58,4 @@ class Wonder extends Stats
     {
         return 'Wonder Stats';
     }
-
-    /**
-     * @return string
-     */
-    protected function getGridLabel()
-    {
-        return 'Wonder Stats';
-    }
-
 }

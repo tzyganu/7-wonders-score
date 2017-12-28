@@ -2,18 +2,15 @@
 namespace Controller\Login;
 
 use Controller\BaseController;
-use Factory\UserQuery;
 use Model\Hash;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Wonders\Base\UserQuery;
 
 class Post extends BaseController
 {
-    /**
-     * @var UserQuery
-     */
-    protected $userQueryFactory;
+
     /**
      * @var Session
      */
@@ -28,38 +25,40 @@ class Post extends BaseController
      * @param Request $request
      * @param Session $session
      * @param Hash $hash
-     * @param UserQuery $userQueryFactory
      */
     public function __construct(
         Request $request,
         Session $session,
-        Hash $hash,
-        UserQuery $userQueryFactory
+        Hash $hash
     ) {
-        $this->session = $session;
-        $this->userQueryFactory = $userQueryFactory;
         $this->hash = $hash;
-        parent::__construct($request);
+        parent::__construct($request, $session);
     }
 
+    /**
+     * @return RedirectResponse
+     */
     public function execute()
     {
-        $username = $this->request->get('username');
-        $password = $this->request->get('password');
-        if (!$username || !$password) {
-            return [];
+        try {
+            $username = $this->request->get('username');
+            $password = $this->request->get('password');
+            if (!$username || !$password) {
+                throw new \Exception('Username and password should not me empty');
+            }
+            $user = UserQuery::create()
+                ->findOneByUsername($username);
+            if (!$user) {
+                throw new \Exception("User not found");
+            }
+            if ($user->getPassword() == $this->hash->hash($password) && $user->getActive() == 1) {
+                $this->session->set('user', $user);
+                return new RedirectResponse($this->request->getBaseUrl() . '/');
+            }
+            throw new \Exception("Wrong password or not active user");
+        } catch (\Exception $e) {
+            $this->addFlashMessage(self::FLASH_MESSAGE_ERROR, $e->getMessage());
+            return new RedirectResponse($this->request->getBaseUrl() . '/login');
         }
-        $user = $this->userQueryFactory->create()
-            ->findOneByUsername($username);
-        if (!$user) {
-            //throw new \Exception("User not found");
-            return new RedirectResponse($this->request->getBaseUrl().'/login');
-        }
-        if ($user->getPassword() == $this->hash->hash($password) && $user->getActive() == 1) {
-            $this->session->set('user', $user);
-            return [];
-        }
-        //throw new \Exception("Wrong password or not active user");
-        return new RedirectResponse($this->request->getBaseUrl().'/login');
     }
 }
