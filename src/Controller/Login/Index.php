@@ -1,33 +1,17 @@
 <?php
 namespace Controller\Login;
 
-use Controller\BaseController;
+use Controller\OutputController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-class Index extends BaseController
+class Index extends OutputController
 {
     /**
-     * @var Session
+     * @var string
      */
-    protected $session;
-
+    protected $template = 'login/index.html.twig';
     /**
-     * Index constructor.
-     * @param Request $request
-     * @param Session $session
-     */
-    public function __construct(
-        Request $request,
-        Session $session
-    ) {
-        $this->session = $session;
-        parent::__construct($request);
-    }
-
-    /**
-     * @return array|RedirectResponse
+     * @return string|RedirectResponse
      */
     public function execute()
     {
@@ -35,6 +19,6 @@ class Index extends BaseController
             $url = $this->request->getBaseUrl().'/';
             return new RedirectResponse($url);
         }
-        return [];
+        return $this->render([]);
     }
 }

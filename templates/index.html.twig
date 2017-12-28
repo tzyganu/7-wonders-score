@@ -1,2 +1,33 @@
 {% extends "layout.html.twig" %}
-
+{% block content %}
+    <section class="content-header">
+        <h1>Dashboard</h1>
+    </section>
+    <section class="content">
+        {% if widgets|length >0 %}
+            {% for widget in widgets %}
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box {{ widget.getClass() }}">
+                    <div class="inner">
+                        <h3>{{ widget.getValue() }}</h3>
+                        <p>{{ widget.getLabel() }}</p>
+                    </div>
+                    <div class="icon">
+                        <i class="{{ widget.getIcon() }}"></i>
+                    </div>
+                    {% if widget.getLink() %}
+                    <a href="{{ widget.getLink() }}" class="small-box-footer">
+                        More info <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                    {% else %}
+                        <a href="#" class="small-box-footer">&nbsp;</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            Nothing to display so far.
+        {%  endif %}
+    </section>
+{% endblock %}

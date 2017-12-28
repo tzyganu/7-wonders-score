@@ -3,43 +3,35 @@ namespace Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 abstract class BaseController
 {
+    const FLASH_MESSAGE = 'flash';
+    const FLASH_MESSAGE_INFO = 'info';
+    const FLASH_MESSAGE_ERROR = 'danger';
+    const FLASH_MESSAGE_WARNING = 'warning';
+    const FLASH_MESSAGE_SUCCESS = 'success';
     /**
      * @var Request
      */
     protected $request;
-
     /**
-     * @var bool
+     * @var Session
      */
-    protected $apiMode = false;
+    protected $session;
 
     /**
      * BaseController constructor.
      * @param Request $request
+     * @param Session $session
      */
     public function __construct(
-        Request $request
+        Request $request,
+        Session $session
     ) {
         $this->request = $request;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isApiMode()
-    {
-        return $this->apiMode;
-    }
-
-    /**
-     * @param bool $apiMode
-     */
-    public function setApiMode($apiMode)
-    {
-        $this->apiMode = $apiMode;
+        $this->session = $session;
     }
 
     /**
@@ -47,29 +39,53 @@ abstract class BaseController
      */
     abstract public function execute();
 
-//    public function respond()
-//    {
-//        try {
-//            $responseData = $this->getResponseData(true);
-//            $response = [
-//                'success' => true,
-//                'data' => $responseData
-//            ];
-//        } catch (\Exception $e) {
-//            $response = [
-//                'success' => false,
-//                'data' => [
-//                    'message' => $e->getMessage()
-//                ]
-//            ];
-//        }
-//        //TODO: add status to response
-//        return JsonResponse::create($response);
-//    }
-//
-//    /**
-//     * @param bool $forApi
-//     * @return mixed
-//     */
-//    abstract protected function getResponseData($forApi = false);
+    /**
+     * @param $type
+     * @param $message
+     */
+    public function addFlashMessage($type, $message)
+    {
+        $messages = $this->session->get(self::FLASH_MESSAGE);
+        if (!$messages) {
+            $messages = [];
+        }
+        if (!isset($messages[$type])) {
+            $messages[$type] = [];
+        }
+        $messages[$type][] = $message;
+        $this->session->set(self::FLASH_MESSAGE, $messages);
+    }
+
+    /**
+     * @param bool $clear
+     * @return mixed
+     */
+    public function getFlashMessages($clear = true)
+    {
+        $messages = $this->session->get(self::FLASH_MESSAGE);
+        if ($clear) {
+            $this->session->set(self::FLASH_MESSAGE, null);
+        }
+        return $messages;
+    }
+
+    /**
+     * @param bool $clear
+     * @return string
+     */
+    public function renderFlashMessages($clear = true)
+    {
+        $messages = $this->getFlashMessages($clear);
+        $html = '';
+        if ($messages) {
+            foreach ($messages as $type => $messageList) {
+                $html .= '<div class="alert alert-'.$type.'"><ul>';
+                foreach ($messageList as $message) {
+                    $html .= '<li>'.$message.'</li>';
+                }
+                $html .= '</ul></div>';
+            }
+        }
+        return $html;
+    }
 }

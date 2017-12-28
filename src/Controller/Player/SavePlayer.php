@@ -2,25 +2,36 @@
 namespace Controller\Player;
 
 use Controller\AuthInterface;
-use Propel\Runtime\Map\TableMap;
+use Controller\BaseController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Wonders\Player;
+use Wonders\PlayerQuery;
 
-class SavePlayer extends PlayerController implements AuthInterface
+class SavePlayer extends BaseController implements AuthInterface
 {
     /**
-     * @return array
+     * @return RedirectResponse
      */
     public function execute()
     {
         $id = $this->request->get('id');
-        if ($id) {
-            $player = $this->playerQueryFactory->create()
-                ->findOneById($id);
-        } else {
-            $player = new Player();
+        try {
+            if ($id) {
+                $player = PlayerQuery::create()
+                    ->findOneById($id);
+            } else {
+                $player = new Player();
+            }
+            $player->setName($this->request->get('name'));
+            $player->save();
+            $this->addFlashMessage(self::FLASH_MESSAGE_SUCCESS, 'The player was saved');
+            return new RedirectResponse($this->request->getBaseUrl().'/player/list');
+        } catch (\Exception $e) {
+            $this->addFlashMessage(self::FLASH_MESSAGE_ERROR, $e->getMessage());
+            if ($id) {
+                return new RedirectResponse($this->request->getBaseUrl() . '/player/edit?id=' . $id);
+            }
+            return new RedirectResponse($this->request->getBaseUrl() . '/player/edit');
         }
-        $player->setName($this->request->get('name'));
-        $player->save();
-        return $player->toArray(TableMap::TYPE_FIELDNAME);
     }
 }

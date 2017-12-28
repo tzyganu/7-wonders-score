@@ -3,7 +3,6 @@
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 
-
 if (file_exists('generated-conf/config.php')) {
     require_once 'generated-conf/config.php';
 }
@@ -16,7 +15,6 @@ $yamlLoader = new  \Config\YamlLoader();
 $commandsFile = 'config/console.yml';
 $commands = $yamlLoader->load($commandsFile);
 
-//TODO: add DI for command classes
 foreach ($commands as $commandClass) {
     $command = new $commandClass();
     $console->add($command);

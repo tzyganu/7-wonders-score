@@ -1,39 +1,17 @@
 <?php
 namespace Controller\Report\Stats;
 
-use Factory\GamePlayerQuery;
-use Factory\PlayerQuery;
-use Symfony\Component\HttpFoundation\Request;
 use Wonders\GamePlayer;
+use Wonders\PlayerQuery;
 
 class Player extends Stats
 {
-    /**
-     * @var PlayerQuery
-     */
-    protected $playerQueryFactory;
-
-    /**
-     * Wonder constructor.
-     * @param Request $request
-     * @param PlayerQuery $wonderQueryFactory
-     * @param GamePlayerQuery $gamePlayerQueryFactory
-     */
-    public function __construct(
-        Request $request,
-        PlayerQuery $playerQueryFactory,
-        GamePlayerQuery $gamePlayerQueryFactory
-    ) {
-        $this->playerQueryFactory = $playerQueryFactory;
-        parent::__construct($request, $gamePlayerQueryFactory);
-    }
-
     /**
      * @return array
      */
     protected function initRows()
     {
-        $players = $this->playerQueryFactory->create()->find();
+        $players = PlayerQuery::create()->find();
         $rows = [];
         foreach ($players as $player) {
             $rows[$player->getId()] = [
@@ -66,13 +44,4 @@ class Player extends Stats
     {
         return 'Player Stats';
     }
-
-    /**
-     * @return string
-     */
-    protected function getGridLabel()
-    {
-        return 'Player Stats';
-    }
-
 }

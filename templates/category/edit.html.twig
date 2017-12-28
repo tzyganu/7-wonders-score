@@ -1,33 +1,41 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div class="pull-right">
+    <div>
         <a href="{{ url('category/list')}}" class="btn btn-primary">Score Category List</a>
     </div>
-    <fieldset>
-        <legend>Score Category</legend>
-        <form id="score-form" action="{{ url('category/save') }}" method="post">
-            <input type="hidden" name="id" value="{{ data.category.id|default('') }}" />
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ data.category.name|default('') }}" style="width:200px" required />
+    <form id="category-form" action="{{ url('category/save') }}" method="post">
+        <input type="hidden" name="id" value="{{ category.id|default('') }}" />
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Category</h3>
             </div>
-            <div class="form-group">
-                <label for="sort_order">Sort Order</label>
-                <input type="text" class="form-control" id="sort_order" name="sort_order" value="{{ data.category.sort_order|default('') }}" style="width:200px" required />
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ category.getName() }}" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="sort_order">Sort Order</label>
+                            <input type="text" class="form-control" id="sort_order" name="sort_order" value="{{ category.getSortOrder() }}" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" id="optional_hidden" name="optional" value="0"/>
+                            <input type="checkbox" class="minimal" id="optional" name="optional" {% if (category.getOptional()) %} checked="checked" {% endif %} value="1" />
+                            <label for="optional">Optional</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="icon_class">Icon Class</label>
+                            <input type="text" class="form-control" id="icon_class" name="icon_class" value="{{ category.getIconClass() }}"/>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="optional">Optional</label>
-                <input type="hidden" class="form-control" id="optional_hidden" name="optional" value="0"/>
-                <input type="checkbox" class="form-control" id="optional" name="optional" {% if (data.category.optional|default('')) %} checked="checked" {% endif %} value="1" style="width: 20px;"/>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-info">Submit</button>
             </div>
-            <div class="form-group">
-                <label for="icon_class">Icon Class</label>
-                <input type="text" class="form-control" id="icon_class" name="icon_class" value="{{ data.category.icon_class|default('') }}"/>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
-    </fieldset>
+        </div>
+    </form>
 {% endblock %}

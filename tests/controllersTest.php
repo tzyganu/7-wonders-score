@@ -21,6 +21,6 @@ class controllersTest extends WebTestCase
         require __DIR__.'/../src/controllers.php';
         $app['session.test'] = true;
 
-        return $this->app = $app;
+        return $this    ->app = $app;
     }
 }

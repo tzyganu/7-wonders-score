@@ -3,64 +3,32 @@
 namespace Controller\Game;
 
 use Controller\AuthInterface;
-use Controller\BaseController;
+use Controller\OutputController;
 use Model\Side;
-use Symfony\Component\HttpFoundation\Request;
+use Propel\Runtime\Map\TableMap;
 use Wonders\Category;
+use Wonders\CategoryQuery;
+use Wonders\PlayerQuery;
+use Wonders\WonderQuery;
 
-class NewGame extends BaseController implements AuthInterface
+class NewGame extends OutputController implements AuthInterface
 {
-    /**
-     * @var \Factory\PlayerQuery
-     */
-    private $playerQueryFactory;
-    /**
-     * @var \Factory\WonderQuery
-     */
-    private $wonderQueryFactory;
-    /**
-     * @var \Factory\CategoryQuery
-     */
-    private $categoryQueryFactory;
-    /**
-     * @var Side
-     */
-    private $sideModel;
+    protected $template = 'game/new.html.twig';
+
+    protected $selectedMenu = 'games';
 
     /**
-     * NewGame constructor.
-     * @param Request $request
-     * @param \Factory\PlayerQuery $playerQueryFactory
-     * @param \Factory\WonderQuery $wonderQueryFactory
-     * @param \Factory\CategoryQuery $categoryQueryFactory
-     * @param Side $sideModel
-     */
-    public function __construct(
-        Request $request,
-        \Factory\PlayerQuery $playerQueryFactory,
-        \Factory\WonderQuery $wonderQueryFactory,
-        \Factory\CategoryQuery $categoryQueryFactory,
-        Side $sideModel
-    ) {
-        $this->playerQueryFactory = $playerQueryFactory;
-        $this->wonderQueryFactory = $wonderQueryFactory;
-        $this->categoryQueryFactory = $categoryQueryFactory;
-        $this->sideModel = $sideModel;
-        parent::__construct($request);
-    }
-
-    /**
-     * @return array
+     * @return string
      */
     public function execute()
     {
-        return [
-            'categories' => $this->getScoringCategories(),
+        return $this->render([
+            'categories' => CategoryQuery::create()->orderBySortOrder()->find()->toArray(null, false, TableMap::TYPE_FIELDNAME),
             'existing_players' => $this->getExistingPlayers(),
             'wonders' => $this->getWonders(),
             'sides' => $this->getSides(),
             'game_date' => date('Y-m-d'),
-        ];
+        ]);
     }
 
     /**
@@ -68,9 +36,7 @@ class NewGame extends BaseController implements AuthInterface
      */
     private function getScoringCategories()
     {
-        $categories = $this->categoryQueryFactory->create()
-            ->orderBySortOrder()
-            ->find();
+        $categories = '';
         $categoryArr = [];
         foreach ($categories as $category) {
             /** @var Category $category */
@@ -89,7 +55,7 @@ class NewGame extends BaseController implements AuthInterface
      */
     private function getExistingPlayers()
     {
-        $players = $this->playerQueryFactory->create()
+        $players = PlayerQuery::create()
             ->orderByName()
             ->find();
         $playerArr = [];
@@ -107,7 +73,7 @@ class NewGame extends BaseController implements AuthInterface
      */
     private function getWonders()
     {
-        $wonders = $this->wonderQueryFactory->create()
+        $wonders = WonderQuery::create()
             ->orderByName()
             ->find();
         $wondersArr = [];
@@ -125,6 +91,7 @@ class NewGame extends BaseController implements AuthInterface
      */
     private function getSides()
     {
-        return $this->sideModel->getSides();
+        $sideModel = new Side();
+        return $sideModel->getSides();
     }
 }

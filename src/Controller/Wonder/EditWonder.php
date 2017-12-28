@@ -2,23 +2,34 @@
 namespace Controller\Wonder;
 
 use Controller\AuthInterface;
-use Propel\Runtime\Map\TableMap;
+use Controller\OutputController;
+use Wonders\Wonder;
+use Wonders\WonderQuery;
 
-class EditWonder extends WonderController implements AuthInterface
+class EditWonder extends OutputController implements AuthInterface
 {
     /**
-     * @return mixed
+     * @var string
+     */
+    protected $selectedMenu = 'wonders';
+    /**
+     * @var string
+     */
+    protected $template = 'wonder/edit.html.twig';
+
+    /**
+     * @return string
      */
     public function execute()
     {
         $id = $this->request->get('id');
         if ($id) {
-            $wonder = $this->wonderQueryFactory->create()
+            $wonder = WonderQuery::create()
                 ->findOneById($id);
             if ($wonder) {
-                return ['wonder' => $wonder->toArray(TableMap::TYPE_FIELDNAME)];
+                return $this->render(['wonder' => $wonder]);
             }
         }
-        return ['wonder' => []];
+        return $this->render(['wonder' => new Wonder()]);
     }
 }

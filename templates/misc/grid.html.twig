@@ -1,0 +1,58 @@
+{% extends "layout.html.twig" %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">{{ grid.getTitle() }}</h3>
+                    {% if grid.getButtons()|length > 0 %}
+                        {% for button in grid.getButtons() %}
+                            <div class="pull-right">
+                                <a href="{{ button.getUrl()}}" class="{{ button.getClass() }}">{{ button.getLabel() }}</a>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="box-body">
+                    <table id="{{ grid.getId() }}" class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            {% for column in grid.getColumns() %}
+                                <th>
+                                    {% if column.getIconClass() %}
+                                        <span class="{{ column.getIconClass }}"></span>
+                                    {% endif %}
+                                    {{ column.getLabel() }}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if grid.getRows()|length > 0 %}
+                            {% for row in grid.getRows() %}
+                                {% set arguments = [row] %}
+                                <tr>
+                                    {% for column in grid.getColumns() %}
+                                        <td>{{ attribute(column, 'render', arguments)|raw }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td align="center" colspan="{{ grid.getColumns()|length }}">{{ grid.getEmptyMessage() }}</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer %}
+    <script type="text/javascript">
+        {% if grid.useDataTable()  %}
+            jQuery('#{{ grid.getId() }}').DataTable({{ grid.getDataTableConfig()|raw }});
+        {% endif %}
+    </script>
+{% endblock %}

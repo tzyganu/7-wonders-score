@@ -2,29 +2,36 @@
 namespace Controller\Wonder;
 
 use Controller\AuthInterface;
-use Propel\Runtime\Map\TableMap;
+use Controller\BaseController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Wonders\Wonder;
+use Wonders\WonderQuery;
 
-class SaveWonder extends WonderController implements AuthInterface
+class SaveWonder extends BaseController implements AuthInterface
 {
     /**
-     * @return array
+     * @return RedirectResponse
      */
     public function execute()
     {
         $id = $this->request->get('id');
-        if ($id) {
-            $category = $this->wonderQueryFactory->create()
-                ->findOneById($id);
-        } else {
-            $category = new Wonder();
-        }
-        $category->setName($this->request->get('name'));
         try {
-            $category->save();
+            if ($id) {
+                $wonder = WonderQuery::create()
+                    ->findOneById($id);
+            } else {
+                $wonder = new Wonder();
+            }
+            $wonder->setName($this->request->get('name'));
+            $wonder->save();
+            $this->addFlashMessage(self::FLASH_MESSAGE_SUCCESS, 'The wonder was saved');
+            return new RedirectResponse($this->request->getBaseUrl().'/wonder/list');
         } catch (\Exception $e) {
-            echo $e->getMessage();exit;
+            $this->addFlashMessage(self::FLASH_MESSAGE_ERROR, $e->getMessage());
+            if ($id) {
+                return new RedirectResponse($this->request->getBaseUrl() . '/wonder/edit?id=' . $id);
+            }
+            return new RedirectResponse($this->request->getBaseUrl() . '/wonder/edit');
         }
-        return $category->toArray(TableMap::TYPE_FIELDNAME);
     }
 }

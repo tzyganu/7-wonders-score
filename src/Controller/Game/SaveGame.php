@@ -2,13 +2,11 @@
 namespace Controller\Game;
 
 use Controller\AuthInterface;
-use Factory\CategoryQuery;
-use Factory\GameQuery;
+use Controller\BaseController;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Propel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Wonders\Game;
 use Wonders\GameCategory;
 use Wonders\GamePlayer;
@@ -16,35 +14,11 @@ use Wonders\Player;
 use Wonders\Score;
 use Wonders\User;
 
-class SaveGame extends GameController implements AuthInterface
+class SaveGame extends BaseController implements AuthInterface
 {
     /**
-     * @var CategoryQuery
+     * @return RedirectResponse
      */
-    protected $categoryQueryFactory;
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * SaveGame constructor.
-     * @param Request $request
-     * @param Session $session
-     * @param GameQuery $gameQueryFactory
-     * @param CategoryQuery $categoryQueryFactory
-     */
-    public function __construct(
-        Request $request,
-        GameQuery $gameQueryFactory,
-        Session $session,
-        CategoryQuery $categoryQueryFactory
-    ) {
-        $this->session = $session;
-        $this->categoryQueryFactory = $categoryQueryFactory;
-        parent::__construct($request, $gameQueryFactory);
-    }
-
     public function execute()
     {
         $conn = Propel::getConnection();
@@ -107,11 +81,12 @@ class SaveGame extends GameController implements AuthInterface
                 }
             }
             $conn->commit();
+            $this->addFlashMessage(self::FLASH_MESSAGE_SUCCESS, 'Game was saved successfully');
         } catch (\Exception $e) {
+            $this->addFlashMessage(self::FLASH_MESSAGE_ERROR, $e->getMessage());
             $conn->rollBack();
-            throw $e;
         }
-        return $game->toArray(TableMap::TYPE_FIELDNAME);
+        return new RedirectResponse($this->request->getBaseUrl().'/game/list');
 
     }
 
@@ -149,7 +124,7 @@ class SaveGame extends GameController implements AuthInterface
 
     private function getGameCategories(array $exclude)
     {
-        $categories = $this->categoryQueryFactory->create();
+        $categories = \Wonders\CategoryQuery::create();
         if (count($exclude)) {
             $categories->filterById($exclude, Criteria::NOT_IN);
         }

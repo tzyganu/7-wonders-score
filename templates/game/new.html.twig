@@ -1,51 +1,82 @@
 {% extends "layout.html.twig" %}
 
 {% block head %}
-
+    <link href="{{ asset('select2/css/select2.css') }}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
-    <fieldset>
-        <legend>New game</legend>
-        <form id="score-form" action="{{ url('game/save') }}" method="post">
-            <div class="form-group">
-                <label for="game-date">Game Date</label>
-                <input type="text" class="form-control" id="game-date" name="game_date" value="{{ data.game_date }}" style="width:200px" />
-            </div>
-            <div class="form-group">
-                <label for="game-name">Players</label>
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="player-table">
-                        <tbody>
-                            <tr id="players">
-                                <td></td>
-                                {% for category in data.categories  %}
-                                    <td>
-                                        <span class="{{ category.icon_class }}"></span>
-                                        {{ category.name }}
-                                        {% if category.optional %}
-                                            <br/>
-                                            <input type="checkbox" id="enabled_category_{{ category.id }}" class="skip-category" value="{{ category.id}}" name="skip_category[]">
-                                            <label for="enabled_category_{{ category.id }}">Disable</label>
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                                <td><span class="fa fa-plus"></span> Total</td>
-                            </tr>
-                        </tbody>
-                    </table>
+<form id="score-form" action="{{ url('game/save') }}" method="post">
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">New game</h3>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="game-date">Game Date</label>
+                        <input type="text" class="form-control" id="game-date" name="game_date" value="{{ game_date }}" required />
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <button type="button" id="add-player">Add player</button>
-            </div>
-            <div class="form-group">
-                <button type="submit">Submit</button>
-            </div>
-        </form>
-    </fieldset>
-    <script type="text/javascript">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="game-name">Players</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="player-table">
+                                <thead>
+                                <tr id="players">
+                                    <td></td>
+                                    {% for category in categories  %}
+                                        <td>
+                                            <span class="{{ category.icon_class }}"></span>
+                                            {{ category.name }}
+                                            {% if category.optional %}
+                                                <br/>
+                                                <input type="checkbox" id="enabled_category_{{ category.id }}" class="skip-category" value="{{ category.id }}" name="skip_category[]">
+                                                <label for="enabled_category_{{ category.id }}">Disable</label>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    <td><span class="fa fa-plus"></span> Total</td>
+                                </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr id="players">
+                                        <td></td>
+                                        {% for category in categories  %}
+                                            <td>
+                                                <span class="{{ category.icon_class }}"></span>
+                                                {{ category.name }}
+                                            </td>
+                                        {% endfor %}
+                                        <td><span class="fa fa-plus"></span> Total</td>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
 
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-footer">
+            <div class="pull-left">
+                <button type="button" id="add-player" class="btn btn-primary">Add player</button>
+            </div>
+            <div class="pull-right">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer%}
+    <script type="text/javascript" src="{{ asset('select2/js/select2.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/game.js') }}"></script>
+    <script type="text/javascript">
         (function() {
             'use strict';
             window.addEventListener('load', function() {
@@ -58,14 +89,14 @@
                     form.classList.add('was-validated');
                 }, false);
             }, false);
-            $('#player-table').game({
+            jQuery('#player-table').game({
                 'addPlayerTrigger': '#add-player',
-                'categories': {{ data.categories|json_encode|raw }},
-                'registeredPlayers': {{ data.existing_players|json_encode|raw }},
-                'wonders': {{ data.wonders|json_encode|raw }},
-                'sides': {{ data.sides|json_encode|raw }}
+                'categories': {{ categories|json_encode|raw }},
+                'registeredPlayers': {{ existing_players|json_encode|raw }},
+                'wonders': {{ wonders|json_encode|raw }},
+                'sides': {{ sides|json_encode|raw }}
             });
-            $('#game-date').datepicker();
+            jQuery('#game-date').datepicker();
         })();
     </script>
 {% endblock %}

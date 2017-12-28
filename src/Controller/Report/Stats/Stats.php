@@ -3,54 +3,20 @@ namespace Controller\Report\Stats;
 
 use Controller\ReportController;
 use Factory\GamePlayerQuery;
+use Model\Grid;
 use Symfony\Component\HttpFoundation\Request;
 use Wonders\GamePlayer;
 
 abstract class Stats extends ReportController
 {
     /**
-     * @var array
+     * @var Grid
      */
-    protected $rows = [];
-    /**
-     * @var GamePlayerQuery
-     */
-    protected $gamePlayerQueryFactory;
-
-    /**
-     * Stats constructor.
-     * @param Request $request
-     * @param GamePlayerQuery $gamePlayerQueryFactory
-     */
-    public function __construct(
-        Request $request,
-        GamePlayerQuery $gamePlayerQueryFactory
-    ) {
-        $this->gamePlayerQueryFactory = $gamePlayerQueryFactory;
-        parent::__construct($request);
-    }
-
+    protected $grid;
     /**
      * @return array
      */
     abstract protected function initRows();
-
-    /**
-     * @return array
-     */
-    protected function getColumns()
-    {
-        return [
-            ['label' => 'Name'],
-            ['label' => 'Games Played'],
-            ['label' => 'Games Won'],
-            ['label' => 'Win %'],
-            ['label' => 'Total Points'],
-            ['label' => 'Average'],
-            ['label' => 'Max points'],
-            ['label' => 'Min points']
-        ];
-    }
 
     /**
      * @param GamePlayer $gamePlayer
@@ -64,11 +30,6 @@ abstract class Stats extends ReportController
     abstract protected function getGridTitle();
 
     /**
-     * @return string
-     */
-    abstract protected function getGridLabel();
-
-    /**
      * @param GamePlayer $gamePlayer
      * @return bool
      */
@@ -80,10 +41,10 @@ abstract class Stats extends ReportController
     /**
      * populate rows with data
      */
-    protected function populateRows()
+    protected function getRows()
     {
         $rows = $this->initRows();
-        $gamePlayers = $this->gamePlayerQueryFactory->create()->find();
+        $gamePlayers = \Wonders\GamePlayerQuery::create()->find();
         foreach ($gamePlayers as $gamePlayer) {
             if (!$this->validate($gamePlayer)) {
                 continue;
@@ -104,11 +65,11 @@ abstract class Stats extends ReportController
         }
         foreach ($rows as $key => $row) {
             $played = $row['played'];
-            $rows[$key]['percentage'] = (($played != 0)
-                    ? sprintf('%.2f', $row['won'] * 100 / $played)
-                    : 0).'%';
-            $rows[$key]['average'] = $played != 0
-                ? sprintf('%.2f', $row['total_points'] / $played)
+            $rows[$key]['percentage'] = ($played != 0)
+                    ? $row['won'] * 100 / $played
+                    : 0;
+            $rows[$key]['average'] = ($played != 0)
+                ? $row['total_points'] / $played
                 : 0;
         }
         //cleanup
@@ -117,20 +78,72 @@ abstract class Stats extends ReportController
                 unset($rows[$key]);
             }
         }
-        $this->rows = $rows;
+        return $rows;
     }
 
-    /**
-     * @return array
-     */
-    public function execute()
+    protected function getGrid()
     {
-        $this->populateRows();
-        return [
-            'title' => $this->getGridTitle(),
-            'label' => $this->getGridLabel(),
-            'columns' => $this->getColumns(),
-            'rows' => $this->rows
-        ];
+        if ($this->grid === null) {
+            $grid = new Grid([
+                'emptyMessage' => 'There is no data so far for this report',
+                'id' => 'stats',
+                'title' => $this->getGridTitle()
+            ]);
+
+            $grid->addColumn(
+                new Grid\Column\Text([
+                    'index' => 'name',
+                    'label' => 'Name'
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'played',
+                    'label' => 'Games Played',
+                ])
+            );
+
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'won',
+                    'label' => 'Games Won',
+                    'defaultSort' => true,
+                    'defaultSortDir' => 'DESC'
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\Percentage([
+                    'index' => 'percentage',
+                    'label' => 'Win %',
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'total_points',
+                    'label' => 'Total Points',
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\DecimalColumn([
+                    'index' => 'average',
+                    'label' => 'Average',
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'max',
+                    'label' => 'Max Points',
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'min',
+                    'label' => 'Min Points',
+                ])
+            );
+            $grid->setRows(array_values($this->getRows()));
+            $this->grid = $grid;
+        }
+        return $this->grid;
     }
 }

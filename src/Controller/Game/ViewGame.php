@@ -1,94 +1,54 @@
 <?php
 namespace Controller\Game;
 
+use Controller\GridController;
+use Controller\OutputController;
+use Model\Grid;
 use Symfony\Component\HttpFoundation\Request;
 use Wonders\Game;
 use Wonders\GameCategory;
+use Wonders\GameQuery;
 use Wonders\Score;
 
-class ViewGame extends GameController
+class ViewGame extends GridController
 {
     /**
-     * @return array
+     * @var string
      */
-    private function getWebData()
+    protected $selectedMenu = 'games';
+    /**
+     * @var Grid
+     */
+    protected $grid;
+
+    /**
+     * @var Game
+     */
+    protected $game;
+
+    /**
+     * @return Game
+     */
+    protected function getGame()
     {
-        $id = $this->request->get('id');
-        if ($id) {
-            $game = $this->gameQueryFactory->create()
-                ->findOneById($id);
-        } else {
-            $game = new Game();
-        }
-        $title = 'Game '.$game->getId().': '.$game->getDate('Y-m-d');
-        $label = 'Score';
-        $columns = [];
-        $columns[] = [
-            'label' => '',
-            'icon_class' => ''
-        ]; //one empty column
-        $categories = $game->getGameCategories();
-        foreach ($categories as $category) {
-            /** @var GameCategory $category */
-            $columns[] = [
-                'label' => $category->getCategory()->getName(),
-                'icon_class' => $category->getCategory()->getIconClass()
-            ];
-        }
-        //get game scores
-        $columns[] = [
-            'label' => 'Total',
-            'icon_class' => 'fa fa-plus'
-        ];
-        $columns[] = [
-            'label' => 'Rank',
-            'icon_class' => 'fa fa-signal'
-        ];
-        $rows = [];
-        $scores = $this->getGameScores($game);
-        foreach ($game->getGamePlayers() as $gamePlayer) {
-            $row = [];
-            $playerNameColumnData = [
-                $gamePlayer->getPlayer()->getName(),
-            ];
-            if ($gamePlayer->getWonderId()) {
-                $playerNameColumnData[] = $gamePlayer->getWonder()->getName();
+        if ($this->game === null) {
+            $id = $this->request->get('id');
+            if ($id) {
+                $this->game = GameQuery::create()
+                    ->findOneById($id);
+            } else {
+                $this->game = new Game();
             }
-            if ($gamePlayer->getSide()) {
-                $playerNameColumnData[] = $gamePlayer->getSide();
-            }
-            $row[] = implode(' - ', $playerNameColumnData);
-            foreach ($categories as $category) {
-                /** @var GameCategory $category */
-                $row[] = $scores[$gamePlayer->getPlayerId()][$category->getCategoryId()];
-            }
-            //add total
-            $row[] = $gamePlayer->getPoints();
-            $row[] = $gamePlayer->getPlace();
-            $rows[] = $row;
         }
-        return [
-            'title' => $title,
-            'label' => $label,
-            'columns' => $columns,
-            'rows' => $rows
-        ];
+        return $this->game;
     }
 
     /**
      * @return array
-     * @throws \Exception
      */
-    public function execute()
+    private function getGameScores()
     {
-        if (!$this->apiMode) {
-            return $this->getWebData();
-        }
-        throw new \Exception('Not Implemented Yet');
-    }
-
-    private function getGameScores(Game $game)
-    {
+        $game = $this->getGame();
         $scoresByPlayer = [];
         $scores = $game->getScores();
         foreach ($scores as $score) {
@@ -96,5 +56,88 @@ class ViewGame extends GameController
             $scoresByPlayer[$score->getPlayerId()][$score->getCategoryId()] = $score->getValue();
         }
         return $scoresByPlayer;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRows()
+    {
+        $game = $this->getGame();
+        $rows = [];
+        $scores = $this->getGameScores();
+        foreach ($game->getGamePlayers() as $gamePlayer) {
+            $playerId = $gamePlayer->getPlayer()->getId();
+            $name = $gamePlayer->getPlayer()->getName();
+            if ($gamePlayer->getWonderId()) {
+                $name .= ': '.$gamePlayer->getWonder()->getName();
+            }
+            if ($gamePlayer->getSide()) {
+                $name .= ' - '.$gamePlayer->getSide();
+            }
+            $row = [
+                'name' => $name,
+                'total' => $gamePlayer->getPoints(),
+                'rank' => $gamePlayer->getPlace()
+            ];
+            foreach ($scores[$playerId] as $key => $value) {
+                $row[$key] = $value;
+            }
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
+    /**
+     * @return Grid
+     */
+    protected function getGrid()
+    {
+        if ($this->grid === null) {
+            $game = $this->getGame();
+            $grid = new Grid([
+                'emptyMessage' => 'Something went wrong here',
+                'id' => 'game',
+                'title' => 'Game '.$game->getId().' : '.$game->getDate('Y-m-d')
+            ]);
+            $grid->addColumn(
+                new Grid\Column\Text([
+                    'index' => 'name',
+                    'label' => ''
+                ])
+            );
+            foreach ($game->getGameCategories() as $category) {
+                $grid->addColumn(
+                    new Grid\Column\IntegerColumn([
+                        'index' => $category->getCategory()->getId(),
+                        'label' => $category->getCategory()->getName(),
+                        'iconClass' => $category->getCategory()->getIconClass()
+                    ])
+                );
+            }
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'total',
+                    'label' => 'Total',
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'rank',
+                    'label' => 'Rank',
+                    'defaultSort' => true
+                ])
+            );
+
+
+            $grid->addButton(
+                'new',
+                new Grid\Button('Game List', $this->request->getBaseUrl().'/game/list')
+            );
+
+            $grid->setRows($this->getRows());
+            $this->grid = $grid;
+        }
+        return $this->grid;
     }
 }
