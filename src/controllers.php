@@ -60,16 +60,10 @@ foreach ($routes as $route) {
     )->bind($route['bind']);
 }
 
-//$app->get('/', function () use ($app, $session) {
-//    return $app['twig']->render('index.html.twig', array('session' => $session));
-//})
-//->bind('homepage')
-//;
-
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
-//    if ($app['debug']) {
-//        return;
-//    }
+    if ($app['debug']) {
+        return;
+    }
 
     // 404.html, or 40x.html, or 4xx.html, or error.html
     $templates = array(
