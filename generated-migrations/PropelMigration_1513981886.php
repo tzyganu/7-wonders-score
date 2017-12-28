@@ -148,7 +148,7 @@ class PropelMigration_1513981886
           CONSTRAINT `FK_SCORE_PLAYER_ID` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
         ) ENGINE=InnoDB AUTO_INCREMENT=393 DEFAULT CHARSET=utf8;
         
-        INSERT INTO `category` VALUES (1,\'Military\',\'0\',\'fa fa-shield\',1),(2,\'Cash\',\'0\',\'fa fa-money\',2),(3,\'Wonder\',\'0\',\'fa fa-exclamation-triangle\',3),(4,\'Blue\',\'0\',\'category-icon category-icon-blue\',4),(5,\'Yellow\',\'0\',\'category-icon category-icon-yellow\',5),(6,\'Guilds\',\'0\',\'category-icon category-icon-purple\',7),(7,\'Science\',\'0\',\'fa fa-flask\',6),(8,\'Leaders & Cities\',\'1\',\'fa fa-user-circle category-icon category-icon-black\',8);
+        INSERT INTO `category` VALUES (1,\'Military\',\'0\',\'fa fa-shield\',1),(2,\'Cash\',\'0\',\'fa fa-money\',2),(3,\'Wonder\',\'0\',\'glyphicon glyphicon-triangle-top\',3),(4,\'Blue\',\'0\',\'category-icon category-icon-blue\',4),(5,\'Yellow\',\'0\',\'category-icon category-icon-yellow\',5),(6,\'Guilds\',\'0\',\'category-icon category-icon-purple\',7),(7,\'Science\',\'0\',\'fa fa-flask\',6),(8,\'Leaders & Cities\',\'1\',\'fa fa-user-circle category-icon category-icon-black\',8);
         INSERT INTO `wonder` VALUES (11,\'Abu Simbel\'),(1,\'Alexandria\'),(2,\'Babylon\'),(10,\'Byzantium\'),(3,\'Ephesos\'),(4,\'Gizah\'),(13,\'Great Wall\'),(5,\'Halikarnassus\'),(14,\'Manneken Pis\'),(6,\'Olympia\'),(8,\'Petra\'),(7,\'Rhodos\'),(9,\'Roma\'),(12,\'Stonehenge\');
         ';
     }
