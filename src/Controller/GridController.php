@@ -8,7 +8,7 @@ abstract class GridController extends OutputController
     /**
      * @var string
      */
-    protected $template = 'misc/grid.html.twig';
+    protected $template = 'grid.html.twig';
 
     /**
      * @return Grid

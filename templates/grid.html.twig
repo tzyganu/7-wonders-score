@@ -1,0 +1,7 @@
+{% extends "layout.html.twig" %}
+{% block content %}
+    {% include 'misc/grid.html.twig' with {'grid': grid} %}
+{% endblock %}
+{% block footer %}
+    {% include 'misc/grid-js.html.twig' with {'grid': grid} %}
+{% endblock %}
