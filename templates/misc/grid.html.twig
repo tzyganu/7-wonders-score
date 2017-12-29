@@ -1,5 +1,4 @@
-{% extends "layout.html.twig" %}
-{% block content %}
+{% if grid is not null %}
     <div class="row">
         <div class="col-xs-12">
             <div class="box">
@@ -48,11 +47,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-{% block footer %}
-    <script type="text/javascript">
-        {% if grid.useDataTable()  %}
-            jQuery('#{{ grid.getId() }}').DataTable({{ grid.getDataTableConfig()|raw }});
-        {% endif %}
-    </script>
-{% endblock %}
+{% endif %}

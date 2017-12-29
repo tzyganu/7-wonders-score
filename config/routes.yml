@@ -222,3 +222,13 @@ report_side:
   method: get
   page_title: Side stats
   bind: report/side
+report_general:
+  controller: \Controller\Report\Stats\General
+  dependencies:
+    - request
+    - session
+    - menuBuilder
+    - twig
+  method: get
+  page_title: General stats
+  bind: report/general

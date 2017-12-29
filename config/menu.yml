@@ -55,6 +55,9 @@ reports:
     side:
       label: Side Stats
       url: report/side
+    general:
+      label: General Stats
+      url: report/general
 
 
 

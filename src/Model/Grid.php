@@ -33,6 +33,26 @@ class Grid
      */
     protected $useDataTable = true;
     /**
+     * @var bool
+     */
+    protected $showPaging = true;
+    /**
+     * @var bool
+     */
+    protected $showSearch = true;
+    /**
+     * @var bool
+     */
+    protected $showSorting = true;
+    /**
+     * @var bool
+     */
+    protected $showPagingAll = true;
+    /**
+     * @var array
+     */
+    protected $pagingValues = [10, 20, 50, 100];
+    /**
      * @var string
      */
     protected $emptyMessage = 'There are no records';
@@ -43,7 +63,7 @@ class Grid
      */
     public function __construct(array $options)
     {
-        $fields = ['emptyMessage', 'id', 'title', 'useDataTable'];
+        $fields = ['emptyMessage', 'id', 'title', 'useDataTable', 'showPaging', 'showSearch', 'showSorting', 'showPagingAll', 'pagingValues'];
         foreach ($fields as $field) {
             if (isset($options[$field])) {
                 $method = 'set'.ucfirst($field);
@@ -166,33 +186,131 @@ class Grid
     }
 
     /**
+     * @return bool
+     */
+    public function isShowPaging()
+    {
+        return $this->showPaging;
+    }
+
+    /**
+     * @param bool $showPaging
+     */
+    public function setShowPaging($showPaging)
+    {
+        $this->showPaging = $showPaging;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowSearch()
+    {
+        return $this->showSearch;
+    }
+
+    /**
+     * @param bool $showSearch
+     */
+    public function setShowSearch($showSearch)
+    {
+        $this->showSearch = $showSearch;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowSorting()
+    {
+        return $this->showSorting;
+    }
+
+    /**
+     * @param bool $showSorting
+     */
+    public function setShowSorting($showSorting)
+    {
+        $this->showSorting = $showSorting;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowPagingAll()
+    {
+        return $this->showPagingAll;
+    }
+
+    /**
+     * @param bool $showPagingAll
+     */
+    public function setShowPagingAll($showPagingAll)
+    {
+        $this->showPagingAll = $showPagingAll;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPagingValues()
+    {
+        return $this->pagingValues;
+    }
+
+    /**
+     * @param array $pagingValues
+     */
+    public function setPagingValues($pagingValues)
+    {
+        $this->pagingValues = $pagingValues;
+    }
+
+    /**
      * @return string
      */
     public function getDataTableConfig()
     {
         $config = [];
-        $nonSortable = [];
-        $defaultOrderColumn = null;
-        $defaultOrder = null;
-        foreach ($this->getColumns() as $key => $column) {
-            if (!$column->isSortable()) {
-                $nonSortable[] = $key;
+        if (!$this->isShowSorting()) {
+            $config['sorting'] = false;
+        } else {
+            $nonSortable = [];
+            $defaultOrderColumn = null;
+            $defaultOrder = null;
+            foreach ($this->getColumns() as $key => $column) {
+                if (!$column->isSortable()) {
+                    $nonSortable[] = $key;
+                }
+                if ($column->isDefaultSort()) {
+                    $defaultOrderColumn = $key;
+                    $defaultOrder = $column->getDefaultSortDir();
+                }
             }
-            if ($column->isDefaultSort()) {
-                $defaultOrderColumn = $key;
-                $defaultOrder = $column->getDefaultSortDir();
+            if (count($nonSortable)) {
+                $config['columnDefs'] = [
+                    ['orderable' => false, 'targets' => $nonSortable]
+                ];
             }
-        }
-        if (count($nonSortable)) {
-            $config['columnDefs'] = [
-                ['orderable' => false, 'targets' => $nonSortable]
-            ];
-        }
-        if ($defaultOrderColumn) {
-            $config['order'] = [
-                [$defaultOrderColumn, strtolower($defaultOrder)]
+            if ($defaultOrderColumn) {
+                $config['order'] = [
+                    [$defaultOrderColumn, strtolower($defaultOrder)]
 
-            ];
+                ];
+            }
+        }
+        if (!$this->isShowPaging()) {
+            $config['paging'] = false;
+        } else {
+            $pagingValues = $this->getPagingValues();
+            $pagingLabels = $this->getPagingValues();
+            if ($this->isShowPagingAll()) {
+                $pagingValues[] = -1;
+                $pagingLabels[] = 'All';
+            }
+            $config['lengthMenu'] = [$pagingValues, $pagingLabels];
+        }
+        if (!$this->isShowSearch()) {
+            $config['search'] = false;
         }
         return json_encode($config);
     }
