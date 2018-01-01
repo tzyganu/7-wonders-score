@@ -1,28 +1,24 @@
-.game-new .container {
-    width: 1350px;
+.yellow {
+    color: yellow;
+    opacity: 0.5;
 }
-.game-view .container {
-    width: 1350px;
+.purple {
+    color: purple;
+    opacity: 0.5;
 }
-.category-icon {
-    width: 16px;
-    height: 16px;
-    display: inline-block;
+.blue {
+    color: blue;
+    opacity: 0.5;
 }
-.category-icon-yellow {
-    background-color: yellow;
+.black {
+    color: black;
+    opacity: 0.5;
 }
-
-.category-icon-blue {
-    background-color: blue;
+.red {
+    color: red;
+    opacity: 0.5;
 }
-
-.category-icon-purple {
-    background-color: purple;
-}
-.category-icon-black {
-    background-color: black;
-}
-.user-panel > .info > p {
-    margin-bottom: 6px;
+.green {
+    color:green;
+    opacity: 0.5;
 }

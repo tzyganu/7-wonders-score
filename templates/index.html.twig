@@ -4,27 +4,43 @@
         <h1>Dashboard</h1>
     </section>
     <section class="content">
-        {% if widgets|length >0 %}
-            {% for widget in widgets %}
-            <div class="col-lg-3 col-xs-6">
-                <!-- small box -->
-                <div class="small-box {{ widget.getClass() }}">
-                    <div class="inner">
-                        <h3>{{ widget.getValue() }}</h3>
-                        <p>{{ widget.getLabel() }}</p>
+        {% if widgetGroups|length >0 %}
+            {% for widgetGroup in widgetGroups %}
+                {% if widgetGroup.widgets|length > 0 %}
+                <div class="box box-default">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ widgetGroup.label }}</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="{{ widget.getIcon() }}"></i>
+                    <div class="box-body">
+                    {% for widget in widgetGroup.widgets %}
+                        <div class="{% if widgetGroup.widgetClass is defined %} {{ widgetGroup.widgetClass }} {% else %}col-lg-3 col-xs-6{%  endif %}">
+                            <!-- small box -->
+                            <div class="small-box {{ widget.getClass() }}">
+                                <div class="inner">
+                                    <h3>{{ widget.getValue() }}</h3>
+                                    <p>{{ widget.getLabel() }}</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="{{ widget.getIcon() }}"></i>
+                                </div>
+                                {% if widget.getLink() %}
+                                    <a href="{{ widget.getLink() }}" class="small-box-footer">
+                                        More info <i class="fa fa-arrow-circle-right"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="small-box-footer">&nbsp;</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
                     </div>
-                    {% if widget.getLink() %}
-                    <a href="{{ widget.getLink() }}" class="small-box-footer">
-                        More info <i class="fa fa-arrow-circle-right"></i>
-                    </a>
-                    {% else %}
-                        <a href="#" class="small-box-footer">&nbsp;</a>
-                    {% endif %}
+                    <!-- /.box-body -->
+                    <div class="box-footer"></div>
                 </div>
-            </div>
+                {% endif %}
             {% endfor %}
         {% else %}
             Nothing to display so far.
