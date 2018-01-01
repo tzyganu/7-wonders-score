@@ -27,28 +27,33 @@
                     </div>
                     <div class="form-group">
                         <label for="search-player">Player</label>
-                        <select class="form-control select2" id="search-player" name="search[player_id]">
+                        <select class="form-control select2" id="search-player" name="search[player_id][]" multiple>
                             {% for player in search.players %}
-
-                                <option value="{{ player.value }}" {% if player.value == search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
+                                <option value="{{ player.value }}" {% if player.value in search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
                             {% endfor %}
                         </select>
+                        <input type="checkbox" id="select-all-players" />
+                        <label for="select-all-players">Select all Players</label>
                     </div>
                     <div class="form-group">
                         <label for="search-wonder">Wonder</label>
-                        <select class="form-control select2" id="search-wonder" name="search[wonder_id]">
+                        <select class="form-control select2" id="search-wonder" name="search[wonder_id][]" multiple>
                             {% for wonder in search.wonders %}
-                                <option value="{{ wonder.value }}" {% if wonder.value == search.values.wonder_id %} selected="selected" {% endif %}>{{ wonder.label }}</option>
+                                <option value="{{ wonder.value }}" {% if wonder.value in search.values.wonder_id %} selected="selected" {% endif %}>{{ wonder.label }}</option>
                             {% endfor %}
                         </select>
+                        <input type="checkbox" id="select-all-wonders" />
+                        <label for="select-all-wonders">Select all Wonders</label>
                     </div>
                     <div class="form-group">
                         <label for="search-side">Side</label>
-                        <select class="form-control select2" id="search-side" name="search[side]">
+                        <select class="form-control select2" id="search-side" name="search[side][]" multiple>
                             {% for side in search.sides %}
-                                <option value="{{ side.value }}" {% if side.value == search.values.side %} selected="selected" {% endif %}>{{ side.label }}</option>
+                                <option value="{{ side.value }}" {% if side.value in search.values.side %} selected="selected" {% endif %}>{{ side.label }}</option>
                             {% endfor %}
                         </select>
+                        <input type="checkbox" id="select-all-sides" />
+                        <label for="select-all-sides">Select all Sides</label>
                     </div>
                 </div>
                 <div class="box-footer">
@@ -67,6 +72,19 @@
     <script type="text/javascript">
         jQuery('#search-date-start, #search-date-end').datepicker();
         jQuery('select').select2();
+        jQuery('#select-all-sides').on('change', function () {
+            selectAllInFilter('#search-side', jQuery(this).prop('checked'));
+        });
+        jQuery('#select-all-players').on('change', function () {
+            selectAllInFilter('#search-player', jQuery(this).prop('checked'));
+        });
+        jQuery('#select-all-wonders').on('change', function () {
+            selectAllInFilter('#search-wonder', jQuery(this).prop('checked'));
+        });
+        function selectAllInFilter(selector, selected) {
+            jQuery(selector).find('option').prop('selected', selected);
+            jQuery(selector).trigger('change');
+        }
     </script>
     {% include 'misc/grid-js.html.twig' with {'grid': grid} %}
 {% endblock %}

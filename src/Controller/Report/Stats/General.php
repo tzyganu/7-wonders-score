@@ -12,16 +12,6 @@ use Wonders\WonderQuery;
 class General extends ReportController
 {
     /**
-     * do not differentiate between options
-     * @var string
-     */
-    const ALL = 'all';
-    /**
-     * show options on one line
-     * @var string
-     */
-    const EACH_ONE = 'each';
-    /**
      * @var string
      */
     protected $template = 'report/general.html.twig';
@@ -80,20 +70,10 @@ class General extends ReportController
      * @param $key
      * @return bool
      */
-    protected function isEachOneFilter($key)
-    {
-        $filters = $this->getFilters();
-        return (isset($filters[$key]) && $filters[$key] == self::EACH_ONE);
-    }
-
-    /**
-     * @param $key
-     * @return bool
-     */
     protected function isSpecificFilter($key)
     {
         $filters = $this->getFilters();
-        return (isset($filters[$key]) && !in_array($filters[$key], [self::EACH_ONE, self::ALL]));
+        return (isset($filters[$key]) && is_array($filters[$key]) && count($filters) > 0);
     }
 
     /**
@@ -101,7 +81,7 @@ class General extends ReportController
      */
     protected function canShowPlayerColumn()
     {
-        return $this->isEachOneFilter('player_id') || $this->isSpecificFilter('player_id');
+        return $this->isSpecificFilter('player_id');
     }
 
     /**
@@ -109,7 +89,7 @@ class General extends ReportController
      */
     protected function canShowWonderColumn()
     {
-        return $this->isEachOneFilter('wonder_id') || $this->isSpecificFilter('wonder_id');
+        return $this->isSpecificFilter('wonder_id');
     }
 
     /**
@@ -117,7 +97,7 @@ class General extends ReportController
      */
     protected function canShowSideColumn()
     {
-        return $this->isEachOneFilter('side') || $this->isSpecificFilter('side');
+        return $this->isSpecificFilter('side');
     }
 
     /**
@@ -234,13 +214,13 @@ class General extends ReportController
         $gamePlayers = \Wonders\GamePlayerQuery::create();
         $filters = $this->getFilters();
         if ($this->isSpecificFilter('player_id')) {
-            $gamePlayers->filterByPlayerId($filters['player_id']);
+            $gamePlayers->filterByPlayerId($filters['player_id'], Criteria::IN);
         }
         if ($this->isSpecificFilter('wonder_id')) {
-            $gamePlayers->filterByWonderId($filters['wonder_id']);
+            $gamePlayers->filterByWonderId($filters['wonder_id'], Criteria::IN);
         }
         if ($this->isSpecificFilter('side')) {
-            $gamePlayers->filterBySide($filters['side']);
+            $gamePlayers->filterBySide($filters['side'], Criteria::IN);
         }
         if (isset($filters['date']['start']) && !empty($filters['date']['start'])) {
             $gamePlayers->useGameQuery()
@@ -321,27 +301,16 @@ class General extends ReportController
     protected function getRowKey(GamePlayer $row)
     {
         $keyParts = ['_'];
-        if ($this->isEachOneFilter('player_id')) {
+        if ($this->isSpecificFilter('player_id')) {
             $keyParts[] = $row->getPlayerId();
         }
-        if ($this->isEachOneFilter('wonder_id')) {
+        if ($this->isSpecificFilter('wonder_id')) {
             $keyParts[] = $row->getWonderId();
         }
-        if ($this->isEachOneFilter('side')) {
+        if ($this->isSpecificFilter('side')) {
             $keyParts[] = $row->getSide();
         }
         return implode('_', $keyParts);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getSpecialSelectValues()
-    {
-        return [
-            ['label' => '--All--', 'value' => self::ALL],
-            ['label' => '--EACH ONE--', 'value' => self::EACH_ONE],
-        ];
     }
 
     /**
@@ -351,7 +320,7 @@ class General extends ReportController
     {
         if (!isset($this->cache['players'])) {
             $players = PlayerQuery::create()->orderByName()->find();
-            $values = $this->getSpecialSelectValues();
+            $values = [];
             foreach ($players as $player) {
                 $values[] = [
                     'label' => $player->getName(),
@@ -370,7 +339,7 @@ class General extends ReportController
     {
         if (!isset($this->cache['wonders'])) {
             $wonders = WonderQuery::create()->orderByName()->find();
-            $values = $this->getSpecialSelectValues();
+            $values = [];
             foreach ($wonders as $wonder) {
                 $values[] = [
                     'label' => $wonder->getName(),
@@ -389,7 +358,7 @@ class General extends ReportController
     {
         if (!isset($this->cache['sides'])) {
             $sideModel = new Side();
-            $values = $this->getSpecialSelectValues();
+            $values = [];
             foreach ($sideModel->getSides() as $side) {
                 $values[] = [
                     'label' => $side['name'],
