@@ -55,6 +55,9 @@ reports:
     side:
       label: Side Stats
       url: report/side
+    category:
+      label: Score Category
+      url: report/category
     general:
       label: General Stats
       url: report/general
