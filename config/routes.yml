@@ -232,3 +232,13 @@ report_general:
   method: get
   page_title: General stats
   bind: report/general
+report_category:
+  controller: \Controller\Report\Stats\Category
+  dependencies:
+    - request
+    - session
+    - menuBuilder
+    - twig
+  method: get
+  page_title: Category stats
+  bind: report/category
