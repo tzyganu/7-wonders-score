@@ -19,7 +19,7 @@ players:
     list:
       label: Player List
       url: player/list
-    new:
+    edit:
       label: New Player
       url: player/edit
 wonders:
@@ -29,7 +29,7 @@ wonders:
     list:
       label: Wonder List
       url: wonder/list
-    new:
+    edit:
       label: New Wonder
       url: wonder/edit
 categories:
@@ -39,28 +39,19 @@ categories:
     list:
       label: Score Category List
       url: category/list
-    new:
+    edit:
       label: New Score Category
       url: category/edit
 reports:
   label: Reports
   icon: fa fa-table
   children:
-    player:
-      label: Player Stats
-      url: report/player
     wonder:
-      label: Wonder Stats
+      label: Wonder Reports
       url: report/wonder
-    side:
-      label: Side Stats
-      url: report/side
     category:
-      label: Score Category
+      label: Score Category Reports
       url: report/category
-    general:
-      label: General Stats
-      url: report/general
 
 
 

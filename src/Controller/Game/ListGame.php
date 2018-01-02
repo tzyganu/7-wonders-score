@@ -14,7 +14,7 @@ class ListGame extends GridController
     /**
      * @var string
      */
-    protected $selectedMenu = 'games';
+    protected $selectedMenu = ['games', 'games-list'];
 
     /**
      * @return array

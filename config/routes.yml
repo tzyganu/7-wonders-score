@@ -192,16 +192,6 @@ logout:
   bind: logout
 
 #REPORTS
-report_player:
-  controller: \Controller\Report\Stats\Player
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
-  method: get
-  page_title: Players stats
-  bind: report/player
 report_wonder:
   controller: \Controller\Report\Stats\Wonder
   dependencies:
@@ -210,28 +200,8 @@ report_wonder:
     - menuBuilder
     - twig
   method: get
-  page_title: Wonder Stats
+  page_title: Wonder stats
   bind: report/wonder
-report_side:
-  controller: \Controller\Report\Stats\Side
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
-  method: get
-  page_title: Side stats
-  bind: report/side
-report_general:
-  controller: \Controller\Report\Stats\General
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
-  method: get
-  page_title: General stats
-  bind: report/general
 report_category:
   controller: \Controller\Report\Stats\Category
   dependencies:

@@ -11,7 +11,7 @@ class ListCategory extends GridController
     /**
      * @var string
      */
-    protected $selectedMenu = 'categories';
+    protected $selectedMenu = ['categories', 'categories-list'];
 
     /**
      * @return Grid

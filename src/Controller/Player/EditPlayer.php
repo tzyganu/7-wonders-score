@@ -11,7 +11,7 @@ class EditPlayer extends OutputController implements AuthInterface
     /**
      * @var string
      */
-    protected $selectedMenu = 'players';
+    protected $selectedMenu = ['players', 'players-edit'];
     /**
      * @var string
      */

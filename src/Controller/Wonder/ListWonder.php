@@ -14,7 +14,7 @@ class ListWonder extends GridController
     /**
      * @var string
      */
-    protected $selectedMenu = 'wonders';
+    protected $selectedMenu = ['wonders', 'wonders-list'];
 
     /**
      * @return Grid

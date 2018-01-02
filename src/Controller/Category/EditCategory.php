@@ -11,7 +11,7 @@ class EditCategory extends OutputController implements AuthInterface
     /**
      * @var string
      */
-    protected $selectedMenu = 'categories';
+    protected $selectedMenu = ['categories', 'categories-edit'];
     /**
      * @var string
      */

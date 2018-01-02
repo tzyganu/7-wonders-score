@@ -193,7 +193,7 @@ class Category extends ReportController
         $categories = $this->getCategories();
         $categoriesById = [];
         foreach ($categories as $category) {
-            $categoriesById[$category['value']] = $category['label'];
+            $categoriesById[$category['value']] = '<span class="'.$category['icon'].'"></span> '.$category['label'];
         }
         $rows = [];
         foreach ($scores as $score) {
@@ -280,7 +280,8 @@ class Category extends ReportController
             foreach ($categories as $category) {
                 $values[] = [
                     'label' => $category->getName(),
-                    'value' => $category->getId()
+                    'value' => $category->getId(),
+                    'icon' => $category->getIconClass()
                 ];
             }
             $this->cache['categories'] = $values;

@@ -1,6 +1,5 @@
 {% extends "layout.html.twig" %}
 {% block head %}
-    <link href="{{ asset('select2/css/select2.css') }}" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block content %}
 <div class="row">
@@ -17,14 +16,7 @@
             <!-- form start -->
             <form role="form" action="" method="get">
                 <div class="box-body">
-                    <div class="form-group">
-                        <label for="search-date-start">Game date from</label>
-                        <input class="form-control" id="search-date-start" type="text" name="search[date][start]" value="{{ search.values.date.start }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="search-date-end">Game date to</label>
-                        <input class="form-control" id="search-date-end" type="text" name="search[date][end]" value="{{ search.values.date.end }}">
-                    </div>
+                    {% include 'misc/search/date.html.twig' with {search: search} %}
                     <div class="form-group">
                         <label for="search-player">Player</label>
                         <select class="form-control select2" id="search-player" name="search[player_id][]" multiple>
@@ -32,8 +24,6 @@
                                 <option value="{{ player.value }}" {% if player.value in search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
                             {% endfor %}
                         </select>
-                        <input type="checkbox" id="select-all-players" />
-                        <label for="select-all-players">Select all Players</label>
                     </div>
                     <div class="form-group">
                         <label for="search-category">Category</label>
@@ -42,8 +32,6 @@
                                 <option value="{{ category.value }}" {% if category.value in search.values.category_id %} selected="selected" {% endif %}>{{ category.label }}</option>
                             {% endfor %}
                         </select>
-                        <input type="checkbox" id="select-all-categories" />
-                        <label for="select-all-categories">Select all Categories</label>
                     </div>
                 </div>
                 <div class="box-footer">
@@ -58,20 +46,12 @@
  </div>
 {% endblock %}
 {% block footer %}
-    <script type="text/javascript" src="{{ asset('select2/js/select2.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/select-all.js') }}"></script>
     <script type="text/javascript">
-        jQuery('#search-date-start, #search-date-end').datepicker();
+        jQuery('#search-player').selectAll();
+        jQuery('#search-category').selectAll();
         jQuery('select').select2();
-        jQuery('#select-all-players').on('change', function () {
-            selectAllInFilter('#search-player', jQuery(this).prop('checked'));
-        });
-        jQuery('#select-all-categories').on('change', function () {
-            selectAllInFilter('#search-category', jQuery(this).prop('checked'));
-        });
-        function selectAllInFilter(selector, selected) {
-            jQuery(selector).find('option').prop('selected', selected);
-            jQuery(selector).trigger('change');
-        }
     </script>
     {% include 'misc/grid-js.html.twig' with {'grid': grid} %}
+    {% include 'misc/search/date-js.html.twig' %}
 {% endblock %}
