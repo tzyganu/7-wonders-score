@@ -11,7 +11,7 @@ class EditWonder extends OutputController implements AuthInterface
     /**
      * @var string
      */
-    protected $selectedMenu = 'wonders';
+    protected $selectedMenu = ['wonders', 'wonders-edit'];
     /**
      * @var string
      */

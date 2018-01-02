@@ -140,25 +140,25 @@ class IndexController extends OutputController
 
         $widgetGroups['highscore'] = [
             'label' => 'High scores',
-            'widgetClass' => 'col-lg-6 col-xs-6',
+            'widgetClass' => 'col-lg-6 col-xs-12',
             'widgets' => []
         ];
 
         $widgetGroups['categories-average'] = [
             'label' => 'Score Categories Averages',
-            'widgetClass' => 'col-lg-4 col-xs-6',
+            'widgetClass' => 'col-lg-6 col-xs-12',
             'widgets' => []
         ];
 
         $widgetGroups['categories-highscore'] = [
             'label' => 'Score Categories High Scores',
-            'widgetClass' => 'col-lg-4 col-xs-6',
+            'widgetClass' => 'col-lg-6 col-xs-12',
             'widgets' => []
         ];
 
         $widgetGroups['latest'] = [
             'label' => 'Latest',
-            'widgetClass' => 'col-lg-6 col-xs-6',
+            'widgetClass' => 'col-lg-6 col-xs-12',
             'widgets' => []
         ];
 
@@ -168,7 +168,7 @@ class IndexController extends OutputController
                 'label' => 'Latest game',
                 'value' => $latestGame->getId(). ' : '.$latestGame->getDate('Y-m-d'),
                 'icon' => 'fa fa-gamepad',
-                'class' => 'bg-green',
+                'class' => 'bg-teal',
                 'link' => $this->request->getBaseUrl().'/game/view?id='.$latestGame->getId()
             ]);
             $widgetGroups['latest']['widgets'][] = $widget;
@@ -180,7 +180,7 @@ class IndexController extends OutputController
                 'label' => 'Latest player',
                 'value' => $latestPlayer->getName(),
                 'icon' => 'fa fa-user',
-                'class' => 'bg-aqua',
+                'class' => 'bg-teal',
                 'link' => $this->request->getBaseUrl().'/player/list'
             ]);
             $widgetGroups['latest']['widgets'][] = $widget;
@@ -192,7 +192,7 @@ class IndexController extends OutputController
                 'label' => 'Most Wins',
                 'value' => $mostWins->getVirtualColumn('name'). ': '.$mostWins->getVirtualColumn('wins'),
                 'icon' => 'fa fa-user',
-                'class' => 'bg-yellow',
+                'class' => 'bg-teal',
                 'link' => $this->request->getBaseUrl().'/stats/player'
             ]);
             $widgetGroups['highscore']['widgets'][] = $widget;
@@ -204,7 +204,7 @@ class IndexController extends OutputController
                 'label' => 'Highscore',
                 'value' => $highScore->getVirtualColumn('name'). ': '.$highScore->getVirtualColumn('score'),
                 'icon' => 'fa fa-user',
-                'class' => 'bg-red',
+                'class' => 'bg-teal',
                 'link' => $this->request->getBaseUrl().'/stats/player'
             ]);
             $widgetGroups['highscore']['widgets'][] = $widget;
@@ -216,13 +216,13 @@ class IndexController extends OutputController
                 'expression' => 'AVG(value)',
                 'alias' => 'average',
                 'group' => 'categories-average',
-                'class' => 'bg-blue'
+                'class' => 'bg-teal'
             ],
             [
                 'expression' => 'MAX(value)',
                 'alias' => 'max',
                 'group' => 'categories-highscore',
-                'class' => 'bg-red'
+                'class' => 'bg-teal'
             ],
         ];
         $categories = $this->getAllCategories();

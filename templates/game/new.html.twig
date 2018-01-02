@@ -1,9 +1,5 @@
 {% extends "layout.html.twig" %}
 
-{% block head %}
-    <link href="{{ asset('select2/css/select2.css') }}" rel="stylesheet" type="text/css" />
-{% endblock %}
-
 {% block content %}
 <form id="score-form" action="{{ url('game/save') }}" method="post">
     <div class="box box-default">
@@ -74,7 +70,6 @@
     </div>
 {% endblock %}
 {% block footer%}
-    <script type="text/javascript" src="{{ asset('select2/js/select2.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/game.js') }}"></script>
     <script type="text/javascript">
         (function() {

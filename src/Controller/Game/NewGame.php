@@ -15,7 +15,7 @@ class NewGame extends OutputController implements AuthInterface
 {
     protected $template = 'game/new.html.twig';
 
-    protected $selectedMenu = 'games';
+    protected $selectedMenu = ['games', 'games-new'];
 
     /**
      * @return string

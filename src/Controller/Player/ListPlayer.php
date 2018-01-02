@@ -14,7 +14,7 @@ class ListPlayer extends GridController
     /**
      * @var string
      */
-    protected $selectedMenu = 'players';
+    protected $selectedMenu = ['players', 'players-list'];
 
     /**
      * @return Grid

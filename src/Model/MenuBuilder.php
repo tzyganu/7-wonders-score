@@ -73,7 +73,10 @@ class MenuBuilder
         if ($this->hasChildren($item)) {
             $class .= ' treeview';
         }
-        if ($id == $selected) {
+        if (is_string($selected)) {
+            $selected = [$selected];
+        }
+        if (in_array($id, $selected)) {
             $class .= ' active';
         }
         $html = '<li'.(($class) ? ' class="'.$class.'"' : '').' id="menu-item-'.$id.'">';
