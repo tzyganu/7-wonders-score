@@ -20,8 +20,6 @@ class PropelMigration_1515142836
 
     public function postUp(MigrationManager $manager)
     {
-//        $connection = $manager->getConnection('default');
-//        var_dump($connection);exit;
         $this->updatePlayerCount();
     }
 
