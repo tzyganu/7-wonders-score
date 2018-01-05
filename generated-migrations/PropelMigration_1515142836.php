@@ -7,7 +7,6 @@ use Propel\Generator\Manager\MigrationManager;
 /**
  * Data object containing the SQL and PHP code to migrate the database
  * up to version 1515142836.
- * Generated on 2018-01-05 11:00:36 by arnia
  */
 class PropelMigration_1515142836
 {
