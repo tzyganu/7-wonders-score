@@ -19,10 +19,5 @@ $app->register(new TwigServiceProvider(), array(
     )));
 $app->register(new HttpFragmentServiceProvider());
 $app->register(new Silex\Provider\SessionServiceProvider());
-$app['twig'] = $app->extend('twig', function ($twig, $app) {
-    // add custom globals, filters, tags, ...
-
-    return $twig;
-});
 
 return $app;
