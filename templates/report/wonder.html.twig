@@ -17,27 +17,51 @@
                     {% include 'misc/search/date.html.twig' with {search: search} %}
                     <div class="form-group">
                         <label for="search-player">Player</label>
-                        <select class="form-control" id="search-player" name="search[player_id][]" multiple>
-                            {% for player in search.players %}
-                                <option value="{{ player.value }}" {% if player.value in search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control" id="search-player" name="search[player_id][]" multiple>
+                                    {% for player in search.players %}
+                                        <option value="{{ player.value }}" {% if player.value in search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="search-wonder">Wonder</label>
-                        <select class="form-control" id="search-wonder" name="search[wonder_id][]" multiple>
-                            {% for wonder in search.wonders %}
-                                <option value="{{ wonder.value }}" {% if wonder.value in search.values.wonder_id %} selected="selected" {% endif %}>{{ wonder.label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control" id="search-wonder" name="search[wonder_id][]" multiple>
+                                    {% for wonder in search.wonders %}
+                                        <option value="{{ wonder.value }}" {% if wonder.value in search.values.wonder_id %} selected="selected" {% endif %}>{{ wonder.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="search-side">Side</label>
-                        <select class="form-control" id="search-side" name="search[side][]" multiple>
-                            {% for side in search.sides %}
-                                <option value="{{ side.value }}" {% if side.value in search.values.side %} selected="selected" {% endif %}>{{ side.label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control" id="search-side" name="search[side][]" multiple>
+                                    {% for side in search.sides %}
+                                        <option value="{{ side.value }}" {% if side.value in search.values.side %} selected="selected" {% endif %}>{{ side.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="search-player-count"># of Players</label>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control" id="search-player-count" name="search[player_count][]" multiple>
+                                    {% for player_count in search.player_count %}
+                                        <option value="{{ player_count.value }}" {% if player_count.value in search.values.player_count %} selected="selected" {% endif %}>{{ player_count.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="box-footer">
@@ -58,6 +82,7 @@
         jQuery('#search-player').selectAll();
         jQuery('#search-wonder').selectAll();
         jQuery('#search-side').selectAll();
+        jQuery('#search-player-count').selectAll();
         jQuery('select').select2();
 
     </script>

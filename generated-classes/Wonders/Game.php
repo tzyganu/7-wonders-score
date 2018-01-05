@@ -16,5 +16,7 @@ use Wonders\Base\Game as BaseGame;
  */
 class Game extends BaseGame
 {
-
+    const MIN_PLAYERS = 3;
+    const MAX_PLAYERS = 8;
+    const DEFAULT_PLAYERS = 6;
 }

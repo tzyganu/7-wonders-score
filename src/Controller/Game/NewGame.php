@@ -8,6 +8,7 @@ use Model\Side;
 use Propel\Runtime\Map\TableMap;
 use Wonders\Category;
 use Wonders\CategoryQuery;
+use Wonders\Game;
 use Wonders\PlayerQuery;
 use Wonders\WonderQuery;
 
@@ -28,28 +29,11 @@ class NewGame extends OutputController implements AuthInterface
             'wonders' => $this->getWonders(),
             'sides' => $this->getSides(),
             'game_date' => date('Y-m-d'),
+            'min_players' => Game::MIN_PLAYERS,
+            'max_players' => Game::MAX_PLAYERS,
+            'default_players' => Game::DEFAULT_PLAYERS
         ]);
     }
-
-    /**
-     * @return array
-     */
-    private function getScoringCategories()
-    {
-        $categories = '';
-        $categoryArr = [];
-        foreach ($categories as $category) {
-            /** @var Category $category */
-            $categoryArr[] = [
-                'name' => $category->getName(),
-                'id' => $category->getId(),
-                'optional' => $category->getOptional(),
-                'icon_class' => $category->getIconClass()
-            ];
-        }
-        return $categoryArr;
-    }
-
     /**
      * @return array
      */
