@@ -41,6 +41,7 @@ class SaveGame extends BaseController implements AuthInterface
             $game = new Game();
             $game->setDate($this->request->get('game_date'));
             $game->setUserId($user->getId());
+            $game->setPlayerCount(count($playerIds));
             $game->save();
             //save game players
             $scoreData = $this->request->get('score');

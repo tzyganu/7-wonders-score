@@ -19,19 +19,39 @@
                     {% include 'misc/search/date.html.twig' with {search: search} %}
                     <div class="form-group">
                         <label for="search-player">Player</label>
-                        <select class="form-control select2" id="search-player" name="search[player_id][]" multiple>
-                            {% for player in search.players %}
-                                <option value="{{ player.value }}" {% if player.value in search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control select2" id="search-player" name="search[player_id][]" multiple>
+                                    {% for player in search.players %}
+                                        <option value="{{ player.value }}" {% if player.value in search.values.player_id %} selected="selected" {% endif %}>{{ player.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="search-category">Category</label>
-                        <select class="form-control select2" id="search-category" name="search[category_id][]" multiple>
-                            {% for category in search.categories %}
-                                <option value="{{ category.value }}" {% if category.value in search.values.category_id %} selected="selected" {% endif %}>{{ category.label }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control select2" id="search-category" name="search[category_id][]" multiple>
+                                    {% for category in search.categories %}
+                                        <option value="{{ category.value }}" {% if category.value in search.values.category_id %} selected="selected" {% endif %}>{{ category.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="search-player-count"># of Players</label>
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <select class="form-control" id="search-player-count" name="search[player_count][]" multiple>
+                                    {% for player_count in search.player_count %}
+                                        <option value="{{ player_count.value }}" {% if player_count.value in search.values.player_count %} selected="selected" {% endif %}>{{ player_count.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="box-footer">
@@ -50,6 +70,7 @@
     <script type="text/javascript">
         jQuery('#search-player').selectAll();
         jQuery('#search-category').selectAll();
+        jQuery('#search-player-count').selectAll();
         jQuery('select').select2();
     </script>
     {% include 'misc/grid-js.html.twig' with {'grid': grid} %}

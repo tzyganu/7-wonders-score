@@ -23,7 +23,9 @@
                             <table class="table table-bordered" id="player-table">
                                 <thead>
                                 <tr id="players">
-                                    <td></td>
+                                    <td>#</td>
+                                    <td>Player</td>
+                                    <td>Wonder</td>
                                     {% for category in categories  %}
                                         <td>
                                             <span class="{{ category.icon_class }}"></span>
@@ -89,7 +91,10 @@
                 'categories': {{ categories|json_encode|raw }},
                 'registeredPlayers': {{ existing_players|json_encode|raw }},
                 'wonders': {{ wonders|json_encode|raw }},
-                'sides': {{ sides|json_encode|raw }}
+                'sides': {{ sides|json_encode|raw }},
+                'maxPlayers': {{ max_players }},
+                'minPlayers': {{ min_players }},
+                'defaultPlayers': {{ default_players }}
             });
             jQuery('#game-date').datepicker();
         })();

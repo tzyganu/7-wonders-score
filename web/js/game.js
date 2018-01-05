@@ -23,7 +23,14 @@ $.widget('wonders.game', {
                 $(this).attr('disabled', 'disabled');
             }
         });
-        for (var i = 0;i<this.options.defaultPlayers;i++) {
+        var defaultPlayers = this.options.defaultPlayers;
+        if (defaultPlayers < this.options.minPlayers) {
+            defaultPlayers = this.options.minPlayers;
+        }
+        if (defaultPlayers > this.options.maxPlayers) {
+            defaultPlayers = this.options.maxPlayers;
+        }
+        for (var i = 0;i<defaultPlayers;i++) {
             this.addPlayer(i>=this.options.minPlayers);
         }
         $('.skip-category').on('change', function(e) {
@@ -44,10 +51,19 @@ $.widget('wonders.game', {
         }
         var tr = $('<tr></tr>');
         tr.attr('id', 'player_row_' + this.playerIndex);
-        var td = $('<td></td>');
-        td.attr('id', 'player_col_' + this.playerIndex + '_header');
-        td.html(this.generatePlayerHeader(this.playerIndex, removable));
-        tr.append(td);
+        var tdIndex = $('<td></td>');
+        tdIndex.html($(this.element).find('tbody').children().length + 1);
+        tr.append(tdIndex);
+        var tdPlayer = $('<td></td>');
+        tdPlayer.attr('id', 'player_col_' + this.playerIndex + '_header');
+        tdPlayer.html(this.generatePlayerHeader(this.playerIndex, removable));
+        tr.append(tdPlayer);
+
+        var tdWonder = $('<td></td>');
+        tdWonder.attr('id', 'wonder_col_' + this.playerIndex + '_header');
+        tdWonder.html(this.generateWonderLine(this.playerIndex));
+        tr.append(tdWonder);
+
         for (var i = 0; i<this.options.categories.length; i++) {
             td = $('<td></td>');
             var categoryId = this.options.categories[i].id;
@@ -108,6 +124,20 @@ $.widget('wonders.game', {
         }
         return select;
     },
+
+    generateWonderLine: function(index) {
+        var line = $('<div></div>');
+        line.addClass('form-group');
+        var wonder = this.generateSelect(
+            'wonder[' + index + ']',
+            this.options.wonders,
+            {'id': 0, 'name': '--Wonder--'}
+        );
+        line.append(wonder);
+        var sides = this.generateSelect('side[' + index + ']', this.options.sides, {'id':0, 'name':'Side'});
+        line.append(sides);
+        return line;
+    },
     generatePlayerHeader: function (index, removable) {
         var wrapper = $('<div></div>');
 
@@ -134,13 +164,20 @@ $.widget('wonders.game', {
             var that = this;
             var del = $('<a></a>');
             del.attr('href', '#');
-            del.addClass('fa fa-trash pull-right');
+            del.addClass('fa fa-trash');
             del.on('click', function (e) {
                 e.preventDefault();
+                if (index < that.options.minPlayers) {
+                    return false;
+                }
                 if (confirm('Are you sure you want to remove player?')) {
                     this.closest('tr').remove();
                     delete that.players[index];
                     $(that.options.addPlayerTrigger).prop('disabled', false);
+                    var trs = $(that.element).find('tbody').children();
+                    for (var i = 0 ;i<trs.length;i++) {
+                        $(trs[i]).find('td:first').html(i+1);
+                    }
                 }
             });
             line1.append(del);
@@ -158,17 +195,6 @@ $.widget('wonders.game', {
         line2.append(input);
         wrapper.append(line2);
 
-        var line3 = $('<div></div>');
-        line3.addClass('form-group');
-        var wonder = this.generateSelect(
-            'wonder[' + index + ']',
-            this.options.wonders,
-            {'id': 0, 'name': '--Wonder--'}
-        );
-        line3.append(wonder);
-        var sides = this.generateSelect('side[' + index + ']', this.options.sides, {'id':0, 'name':'Side'});
-        line3.append(sides);
-        wrapper.append(line3);
         return wrapper;
     },
     generateScoreInput: function (playerIndex, categoryIndex, isTotal) {

@@ -32,6 +32,7 @@ class Category extends ReportController
         $filters = $this->getFilters();
         $vars = parent::getAllVars($vars);
         $vars['search'] = [
+            'player_count' => $this->getPlayerCounts(),
             'players' => $this->getPlayers(),
             'categories' => $this->getCategories(),
             'values' => [
@@ -41,6 +42,7 @@ class Category extends ReportController
                 ],
                 'player_id' => isset($filters['player_id']) ? $filters['player_id'] : '',
                 'category_id' => isset($filters['category_id']) ? $filters['category_id'] : '',
+                'player_count' => isset($filters['player_count']) ? $filters['player_count'] : '',
             ]
         ];
 
@@ -182,6 +184,11 @@ class Category extends ReportController
         if (isset($filters['date']['end']) && !empty($filters['date']['end'])) {
             $scores->useGameQuery()
                 ->filterByDate($filters['date']['end'], Criteria::LESS_EQUAL)
+                ->endUse();
+        }
+        if (isset($filters['player_count']) && !empty($filters['player_count'])) {
+            $scores->useGameQuery()
+                ->filterByPlayerCount($filters['player_count'], Criteria::IN)
                 ->endUse();
         }
         $players = $this->getPlayers();

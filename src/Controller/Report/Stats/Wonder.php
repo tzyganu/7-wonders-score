@@ -2,7 +2,6 @@
 namespace Controller\Report\Stats;
 
 use Controller\ReportController;
-use Model\DatePreset;
 use Model\Grid;
 use Model\Side;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -33,12 +32,12 @@ class Wonder extends ReportController
      */
     public function getAllVars($vars)
     {
-        $presets = new DatePreset();
         $filters = $this->getFilters();
         $vars = parent::getAllVars($vars);
         $vars['search'] = [
             'players' => $this->getPlayers(),
             'wonders' => $this->getWonders(),
+            'player_count' => $this->getPlayerCounts(),
             'sides' => $this->getSides(),
             'values' => [
                 'date' => [
@@ -48,6 +47,7 @@ class Wonder extends ReportController
                 'player_id' => isset($filters['player_id']) ? $filters['player_id'] : '',
                 'wonder_id' => isset($filters['wonder_id']) ? $filters['wonder_id'] : '',
                 'side' => isset($filters['side']) ? $filters['side'] : '',
+                'player_count' => isset($filters['player_count']) ? $filters['player_count'] : '',
             ]
         ];
 
@@ -234,6 +234,11 @@ class Wonder extends ReportController
         if (isset($filters['date']['end']) && !empty($filters['date']['end'])) {
             $gamePlayers->useGameQuery()
                 ->filterByDate($filters['date']['end'], Criteria::LESS_EQUAL)
+                ->endUse();
+        }
+        if (isset($filters['player_count']) && !empty($filters['player_count'])) {
+            $gamePlayers->useGameQuery()
+                ->filterByPlayerCount($filters['player_count'], Criteria::IN)
                 ->endUse();
         }
         $players = $this->getPlayers();

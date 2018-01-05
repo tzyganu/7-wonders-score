@@ -24,6 +24,7 @@ class ListGame extends GridController
         $games = GameQuery::create()
             ->addAsColumn('id', 'Game.id')
             ->addAsColumn('date', 'Game.date')
+            ->addAsColumn('player_count', 'Game.player_count')
             ->useGamePlayerQuery()
                 ->usePlayerQuery()
                     ->addAsColumn('player_name', 'GROUP_CONCAT(name SEPARATOR ", ")')
@@ -58,6 +59,12 @@ class ListGame extends GridController
                     'label' => 'Date',
                     'defaultSort' => true,
                     'defaultSortDir' => 'DESC'
+                ])
+            );
+            $grid->addColumn(
+                new Grid\Column\IntegerColumn([
+                    'index' => 'player_count',
+                    'label' => '# Players',
                 ])
             );
             $grid->addColumn(

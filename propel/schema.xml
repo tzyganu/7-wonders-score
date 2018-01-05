@@ -40,6 +40,7 @@
         <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="date" phpName="Date" type="DATE" required="true"/>
         <column name="user_id" phpName="UserId" type="INTEGER" size="10" />
+        <column name="player_count" phpName="PlayerCount" type="TINYINT" size="4" default="0" />
         <index name="IDX_CATEGORY_NAME">
             <index-column name="name"/>
         </index>
