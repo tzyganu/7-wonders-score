@@ -31,6 +31,13 @@ class ListCategory extends GridController
                 ])
             );
             $grid->addColumn(
+                new Grid\Column\Icon([
+                    'index' => 'getIconClass',
+                    'label' => 'Icon',
+                    'sortable' => false
+                ])
+            );
+            $grid->addColumn(
                 new Grid\Column\Text([
                     'index' => 'getName',
                     'label' => 'Name'
@@ -42,13 +49,6 @@ class ListCategory extends GridController
                     'label' => 'Sort Order',
                     'defaultSort' => true,
                     'defaultSortDir' => 'ASC'
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\Icon([
-                    'index' => 'getIconClass',
-                    'label' => 'Icon',
-                    'sortable' => false
                 ])
             );
             $grid->addColumn(
