@@ -60,7 +60,7 @@ foreach ($routes as $route) {
     )->bind($route['bind']);
 }
 
-$app->error(function (\Exception $e, Request $request, $code) use ($app) {
+/*$app->error(function (\Exception $e, Request $request, $code) use ($app) {
     if ($app['debug']) {
         return;
     }
@@ -74,4 +74,4 @@ $app->error(function (\Exception $e, Request $request, $code) use ($app) {
     );
 
     return new Response($app['twig']->resolveTemplate($templates)->render(array('code' => $code)), $code);
-});
+});*/
