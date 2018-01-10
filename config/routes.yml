@@ -212,3 +212,10 @@ report_category:
   method: get
   page_title: Category stats
   bind: report/category
+heartbeat:
+  controller: \Controller\HeartbeatController
+  dependencies:
+    - request
+    - session
+  method: get
+  bind: heartbeat

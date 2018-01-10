@@ -67,6 +67,10 @@
             <div class="pull-left">
                 <button type="button" id="add-player" class="btn btn-primary">Add player</button>
             </div>
+            <div class="text-center">
+                <button type="button" id="random-wonder" class="btn btn-primary">Randomize wonders</button>
+                <button type="button" id="random-side" class="btn btn-primary">Randomize Sides</button>
+            </div>
             <div class="pull-right">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
@@ -96,9 +100,14 @@
                 'sides': {{ sides|json_encode|raw }},
                 'maxPlayers': {{ max_players }},
                 'minPlayers': {{ min_players }},
-                'defaultPlayers': {{ default_players }}
+                'defaultPlayers': {{ default_players }},
+                'randomizeWondersTrigger': jQuery('#random-wonder'),
+                'randomizeSidesTrigger': jQuery('#random-side'),
             });
             jQuery('#game-date').datepicker();
+            setInterval(function () {
+                jQuery.get('{{ url('heartbeat') }}', {});
+            }, 60000)
         })();
     </script>
 {% endblock %}
