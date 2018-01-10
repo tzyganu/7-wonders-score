@@ -47,7 +47,7 @@ class IndexController extends OutputController
 
     protected function getMostWins()
     {
-        $player = PlayerQuery::create()
+        $players = PlayerQuery::create()
             ->useGamePlayerQuery()
             ->addAsColumn('wins', 'COUNT(1)')
             ->addAsColumn('name', 'Player.Name')
@@ -55,21 +55,55 @@ class IndexController extends OutputController
             ->endUse()
             ->groupById()
             ->addDescendingOrderByColumn('wins')
-            ->findOne();
-        return $player;
+            ->find();
+        $max = null;
+        $names = [];
+        foreach ($players as $player) {
+            $wins = $player->getVirtualColumn('wins');
+            if ($max === null) {
+                $max = $wins;
+                $names[] = $player->getName();
+            } elseif ($wins < $max) {
+                break;
+            }
+        }
+        if ($max === null) {
+            return null;
+        }
+        return [
+            'value' => $max,
+            'names' => implode(', ', $names)
+        ];
     }
 
     protected function getHighScore()
     {
-        $player = PlayerQuery::create()
+        $players = PlayerQuery::create()
             ->useGamePlayerQuery()
             ->addAsColumn('score', 'MAX(points)')
             ->addAsColumn('name', 'Player.Name')
             ->endUse()
             ->groupById()
             ->addDescendingOrderByColumn('score')
-            ->findOne();
-        return $player;
+            ->find();
+        $max = null;
+        $names = [];
+        foreach ($players as $player) {
+            $score = $player->getVirtualColumn('score');
+            if ($max === null) {
+                $max = $score;
+                $names[] = $player->getName();
+            } elseif ($score < $max) {
+                break;
+            }
+        }
+        if ($max === null) {
+            return null;
+        }
+        return [
+            'value' => $max,
+            'names' => implode(', ', $names)
+        ];
     }
 
     /**
@@ -189,11 +223,11 @@ class IndexController extends OutputController
         $mostWins = $this->getMostWins();
         if ($mostWins) {
             $widget = new Widget([
-                'label' => 'Most Wins',
-                'value' => $mostWins->getVirtualColumn('name'). ': '.$mostWins->getVirtualColumn('wins'),
+                'label' => $mostWins['names'],
+                'value' => "Most wins: ". $mostWins['value'],
                 'icon' => 'fa fa-user',
                 'class' => 'bg-teal',
-                'link' => $this->request->getBaseUrl().'/stats/player'
+                'link' => $this->request->getBaseUrl().'/report/wonder'
             ]);
             $widgetGroups['highscore']['widgets'][] = $widget;
         }
@@ -201,11 +235,11 @@ class IndexController extends OutputController
         $highScore = $this->getHighScore();
         if ($highScore) {
             $widget = new Widget([
-                'label' => 'Highscore',
-                'value' => $highScore->getVirtualColumn('name'). ': '.$highScore->getVirtualColumn('score'),
+                'label' => $highScore['names'],
+                'value' => 'Highscore: '.$highScore['value'],
                 'icon' => 'fa fa-user',
                 'class' => 'bg-teal',
-                'link' => $this->request->getBaseUrl().'/stats/player'
+                'link' => $this->request->getBaseUrl().'/report/wonder'
             ]);
             $widgetGroups['highscore']['widgets'][] = $widget;
         }
