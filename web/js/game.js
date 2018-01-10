@@ -12,7 +12,9 @@ $.widget('wonders.game', {
         addPlayerTrigger: '',
         registeredPlayers: [],
         wonders: [],
-        sides: []
+        sides: [],
+        randomizeWondersTrigger: null,
+        randomizeSidesTrigger: null
     },
     _create: function() {
         var that = this;
@@ -39,7 +41,42 @@ $.widget('wonders.game', {
             for (var i in Object.keys(that.players)) {
                 that.calculateTotal(that.players[keys[i]]);
             }
-        })
+        });
+        if (this.options.randomizeWondersTrigger) {
+            this.options.randomizeWondersTrigger.on('click', function() {
+                var wonders = that.options.wonders;
+                that.shuffle(wonders);
+                var wonderSelects = $(that.element).find('select.wonder-select');
+                for (var i = 0; i < wonderSelects.length; i++) {
+                    $(wonderSelects[i]).val(wonders[i].id).trigger('change');
+                }
+            });
+        }
+        if (this.options.randomizeSidesTrigger) {
+            this.options.randomizeSidesTrigger.on('click', function() {
+                var sides = that.options.sides;
+                var sideSelects = $(that.element).find('select.side-select');
+                for (var i = 0; i < sideSelects.length; i++) {
+                    that.shuffle(sides);
+                    $(sideSelects[i]).val(sides[0].id).trigger('change');
+                }
+            });
+        }
+    },
+    shuffle: function (array) {
+        var m = array.length, t, i;
+
+        // While there remain elements to shuffle…
+        while (m) {
+            // Pick a remaining element…
+            i = Math.floor(Math.random() * m--);
+            // And swap it with the current element.
+            t = array[m];
+            array[m] = array[i];
+            array[i] = t;
+        }
+
+        return array;
     },
     canAddPlayer: function() {
         return (Object.keys(this.players).length < this.options.maxPlayers);
@@ -133,8 +170,10 @@ $.widget('wonders.game', {
             this.options.wonders,
             {'id': 0, 'name': '--Wonder--'}
         );
+        wonder.addClass('wonder-select');
         line.append(wonder);
         var sides = this.generateSelect('side[' + index + ']', this.options.sides, {'id':0, 'name':'Side'});
+        sides.addClass('side-select');
         line.append(sides);
         return line;
     },
