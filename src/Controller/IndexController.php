@@ -63,6 +63,8 @@ class IndexController extends OutputController
             if ($max === null) {
                 $max = $wins;
                 $names[] = $player->getName();
+            } elseif ($wins == $max) {
+                $names[] = $player->getName();
             } elseif ($wins < $max) {
                 break;
             }
@@ -92,6 +94,8 @@ class IndexController extends OutputController
             $score = $player->getVirtualColumn('score');
             if ($max === null) {
                 $max = $score;
+                $names[] = $player->getName();
+            } elseif ($score == $max) {
                 $names[] = $player->getName();
             } elseif ($score < $max) {
                 break;
@@ -272,6 +276,7 @@ class IndexController extends OutputController
                     'value' => $category->getName() . ' :' . $value,
                     'icon' => $category->getIconClass(),
                     'class' => $expression['class'],
+                    'link' => $this->request->getBaseUrl().'/report/category'
                 ]);
                 $widgetGroups[$expression['group']]['widgets'][] = $widget;
             }
