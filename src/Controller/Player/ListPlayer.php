@@ -1,62 +1,48 @@
 <?php
 namespace Controller\Player;
 
+use Controller\ControllerInterface;
 use Controller\GridController;
 use Model\Grid;
-use Wonders\PlayerQuery;
+use Service\Player;
+use Symfony\Component\HttpFoundation\Request;
 
-class ListPlayer extends GridController
+class ListPlayer extends GridController implements ControllerInterface
 {
+    const GRID_NAME = 'player';
     /**
-     * @var Grid
+     * @var Player
      */
-    protected $grid;
-    /**
-     * @var string
-     */
-    protected $selectedMenu = ['players', 'players-list'];
+    private $playerService;
 
     /**
-     * @return Grid
+     * ListPlayer constructor.
+     * @param Request $request
+     * @param Grid\Loader $gridLoader
+     * @param \Twig_Environment $twig
+     * @param Player $playerService
+     * @param string $template
+     * @param string $pageTitle
+     * @param array $selectedMenu
      */
-    protected function getGrid()
+    public function __construct(
+        Request $request,
+        Grid\Loader $gridLoader,
+        \Twig_Environment $twig,
+        Player $playerService,
+        $template = '',
+        $pageTitle = '',
+        array $selectedMenu = []
+    ) {
+        $this->playerService = $playerService;
+        parent::__construct($request, $gridLoader, $twig, $template, $pageTitle, $selectedMenu);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRows()
     {
-        if ($this->grid === null) {
-            $grid = new Grid([
-                'emptyMessage' => 'There are no players',
-                'id' => 'players',
-                'title' => 'Players'
-            ]);
-            $grid->addColumn(
-                new Grid\Column\IntegerColumn([
-                    'index' => 'getId',
-                    'label' => 'Id'
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\Text([
-                    'index' => 'getName',
-                    'label' => 'Name',
-                    'defaultSort' => true
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\Edit([
-                    'index' => 'getId',
-                    'label' => 'Edit',
-                    'sortable' => false,
-                    'url' => $this->request->getBaseUrl().'/player/edit?id='
-                ])
-            );
-
-            $grid->addButton(
-                'new',
-                new Grid\Button('Add New Player', $this->request->getBaseUrl().'/player/new')
-            );
-
-            $grid->setRows(PlayerQuery::create()->find());
-            $this->grid = $grid;
-        }
-        return $this->grid;
+        return $this->playerService->getPlayers();
     }
 }

@@ -1,14 +1,14 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div>
-        <a href="{{ url('category/list')}}" class="btn btn-primary">Score Category List</a>
-    </div>
     <form id="category-form" action="{{ url('category/save') }}" method="post">
         <input type="hidden" name="id" value="{{ category.id|default('') }}" />
         <div class="box box-default">
             <div class="box-header with-border">
-                <h3 class="box-title">Category</h3>
+                <h3 class="box-title">{{ page_title }}</h3>
+                <div class="pull-right">
+                    <a href="{{ url('category/list')}}" class="btn btn-primary">Score Category List</a>
+                </div>
             </div>
             <div class="box-body">
                 <div class="row">
@@ -29,6 +29,7 @@
                         <div class="form-group">
                             <label for="icon_class">Icon Class</label>
                             <input type="text" class="form-control" id="icon_class" name="icon_class" value="{{ category.getIconClass() }}"/>
+                            <span id="icon-sample" class="input-group-addon"></span>
                         </div>
                     </div>
                 </div>
@@ -38,4 +39,22 @@
             </div>
         </div>
     </form>
+{% endblock %}
+{% block footer %}
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            var iconClass = $('#icon_class');
+            iconClass.on('change', function () {
+                var sample = $('#icon-sample');
+                var value = $(this).val();
+                if (value === '') {
+                    sample.html('');
+                } else {
+                    sample.html('<span class="' + value + '"></span>');
+                }
+            });
+            iconClass.trigger('change');
+        });
+
+    </script>
 {% endblock %}

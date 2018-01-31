@@ -6,29 +6,47 @@ class Widget
     /**
      * @var string
      */
-    protected $value;
+    private $value;
     /**
      * @var string
      */
-    protected $label;
+    private $label;
     /**
      * @var string
      */
-    protected $link;
+    private $link;
     /**
      * @var string
      */
-    protected $icon;
+    private $icon;
     /**
      * @var string
      */
-    protected $class;
+    private $cssClass = 'bg-teal';
+    /**
+     * @var string
+     */
+    private $outerClass = 'col-lg-6 col-xs-12';
+    /**
+     * @var string
+     */
+    private $template;
+    /**
+     * @var \Twig_Environment
+     */
+    private $twig;
 
     /**
-     * Column constructor.
+     * Widget constructor.
+     * @param \Twig_Environment $twig
      * @param array $options
+     * @param string $template
      */
-    public function __construct(array $options) {
+    public function __construct(
+        \Twig_Environment $twig,
+        array $options,
+        $template = 'widget.html.twig'
+    ) {
         $fields = $this->getConstructorOptionsFields();
         foreach ($fields as $field) {
             if (isset($options[$field])) {
@@ -36,14 +54,16 @@ class Widget
                 $this->$method($options[$field]);
             }
         }
+        $this->twig     = $twig;
+        $this->template = $template;
     }
 
     /**
      * @return array
      */
-    protected function getConstructorOptionsFields()
+    private function getConstructorOptionsFields()
     {
-        return ['value', 'label', 'link', 'icon', 'class'];
+        return ['value', 'label', 'link', 'icon', 'cssClass', 'outerClass'];
     }
 
     /**
@@ -113,16 +133,50 @@ class Widget
     /**
      * @return string
      */
-    public function getClass()
+    public function getCssClass()
     {
-        return $this->class;
+        return $this->cssClass;
     }
 
     /**
-     * @param string $class
+     * @param string $cssClass
      */
-    public function setClass($class)
+    public function setCssClass($cssClass)
     {
-        $this->class = $class;
+        $this->cssClass = $cssClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOuterClass()
+    {
+        return $this->outerClass;
+    }
+
+    /**
+     * @param string $outerClass
+     */
+    public function setOuterClass($outerClass)
+    {
+        $this->outerClass = $outerClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        return $this->twig->render(
+            $this->template,
+            [
+                'label' => $this->getLabel(),
+                'value' => $this->getValue(),
+                'cssClass' => $this->getCssClass(),
+                'outerClass' => $this->getOuterClass(),
+                'icon' => $this->getIcon(),
+                'link' => $this->getLink()
+            ]
+        );
     }
 }

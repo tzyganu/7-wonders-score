@@ -9,67 +9,105 @@ class Grid
     /**
      * @var Column[]
      */
-    protected $columns = [];
+    private $columns = [];
     /**
      * @var Button[]
      */
-    protected $buttons = [];
-
+    private $buttons = [];
     /**
      * @var array
      */
-    protected $rows = [];
+    private $rows = [];
     /**
      * @var string
      */
-    protected $title;
+    private $title;
     /**
      * @var string
      */
-    protected $id;
+    private $id;
 
     /**
      * @var bool
      */
-    protected $useDataTable = true;
+    private $useDataTable = true;
     /**
      * @var bool
      */
-    protected $showPaging = true;
+    private $showPaging = true;
     /**
      * @var bool
      */
-    protected $showSearch = true;
+    private $showSearch = true;
     /**
      * @var bool
      */
-    protected $showSorting = true;
+    private $showSorting = true;
     /**
      * @var bool
      */
-    protected $showPagingAll = true;
+    private $showPagingAll = true;
     /**
      * @var array
      */
-    protected $pagingValues = [10, 20, 50, 100];
+    private $pagingValues = [10, 20, 50, 100];
     /**
      * @var string
      */
-    protected $emptyMessage = 'There are no records';
+    private $emptyMessage = 'There are no records';
+    /**
+     * @var string
+     */
+    private $template = 'grid.html.twig';
+    /**
+     * @var \Twig_Environment
+     */
+    private $twig;
 
     /**
      * Grid constructor.
+     * @param \Twig_Environment $twig
      * @param array $options
      */
-    public function __construct(array $options)
-    {
-        $fields = ['emptyMessage', 'id', 'title', 'useDataTable', 'showPaging', 'showSearch', 'showSorting', 'showPagingAll', 'pagingValues'];
+    public function __construct(
+        \Twig_Environment $twig,
+        array $options
+    ) {
+        $this->twig = $twig;
+        $fields = [
+            'emptyMessage',
+            'id',
+            'title',
+            'useDataTable',
+            'showPaging',
+            'showSearch',
+            'showSorting',
+            'showPagingAll',
+            'pagingValues',
+            'template'
+        ];
         foreach ($fields as $field) {
             if (isset($options[$field])) {
                 $method = 'set'.ucfirst($field);
                 $this->$method($options[$field]);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param string $template
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
     }
 
     /**
@@ -138,7 +176,7 @@ class Grid
     }
 
     /**
-     * @param Column $column
+     * @param Column $column //TODO: CHange to column interface
      */
     public function addColumn(Column $column)
     {
@@ -146,7 +184,7 @@ class Grid
     }
 
     /**
-     * @return Column[]
+     * @return Column[] //TODO: CHange to column interface
      */
     public function getColumns()
     {
@@ -265,6 +303,11 @@ class Grid
         $this->pagingValues = $pagingValues;
     }
 
+    public function render()
+    {
+        return $this->twig->render($this->getTemplate(), ['grid' => $this ]);
+    }
+
     /**
      * @return string
      */
@@ -314,5 +357,4 @@ class Grid
         }
         return json_encode($config);
     }
-
 }

@@ -1,0 +1,12 @@
+highscore:
+  label: Highscore
+  provider: Model\Widget\Provider\Highscores
+category-average:
+  label: Score category averages
+  provider: \Model\Widget\Provider\CategoryAverage
+category-highscore:
+  label: Score category highscores
+  provider: \Model\Widget\Provider\CategoryHighscore
+#latest:
+#  label: Latest
+#  provider: \Widget\Provider\Latest

@@ -1,0 +1,26 @@
+options:
+  emptyMessage: There are no wonder groups.
+  id: wonder-groups
+  title: Wonder Groups
+columns:
+  id:
+    type: integer
+    index: getId
+    label: Id
+    defaultSort: true
+  name:
+    type: text
+    index: getName
+    label: Name
+  edit:
+    type: link
+    index: getId
+    label: Edit
+    url: 'wonder-group/edit'
+    sortable: false
+    params:
+      id: getId
+buttons:
+  new:
+    label: Add new Wonder Group
+    url: 'wonder-group/new'

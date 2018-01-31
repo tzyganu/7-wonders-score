@@ -5,7 +5,7 @@
         <div class="login-box-body">
             <p class="login-box-msg">Sign in to start your session</p>
 
-            <form action="{{ url('login/post') }}" method="post">
+            <form action="{{ url('login/post', {back: back}) }}" method="post">
                 <div class="form-group has-feedback">
                     <input type="text" class="form-control" name="username" placeholder="Username" required />
                     <span class="glyphicon glyphicon-user form-control-feedback"></span>

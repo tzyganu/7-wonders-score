@@ -1,95 +1,82 @@
 <?php
 namespace Controller\Game;
 
+use Controller\ControllerInterface;
 use Controller\GridController;
 use Model\Grid;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Map\TableMap;
-use Wonders\GameQuery;
+use Model\UrlBuilder;
+use Service\Game;
+use Symfony\Component\HttpFoundation\Request;
 
-class ListGame extends GridController
+class ListGame extends GridController implements ControllerInterface
 {
-
-    protected $grid;
+    const GRID_NAME = 'game';
     /**
-     * @var string
+     * @var Game
      */
-    protected $selectedMenu = ['games', 'games-list'];
+    private $gameService;
+    /**
+     * @var UrlBuilder
+     */
+    private $urlBuilder;
+
+    /**
+     * ListGame constructor.
+     * @param Request $request
+     * @param Grid\Loader $gridLoader
+     * @param \Twig_Environment $twig
+     * @param Game $gameService
+     * @param UrlBuilder $urlBuilder
+     * @param string $template
+     * @param string $pageTitle
+     * @param array $selectedMenu
+     */
+    public function __construct(
+        Request $request,
+        Grid\Loader $gridLoader,
+        \Twig_Environment $twig,
+        Game $gameService,
+        UrlBuilder $urlBuilder,
+        $template = '',
+        $pageTitle = '',
+        array $selectedMenu = []
+    ) {
+        $this->gameService = $gameService;
+        $this->urlBuilder  = $urlBuilder;
+        parent::__construct($request, $gridLoader, $twig, $template, $pageTitle, $selectedMenu);
+    }
 
     /**
      * @return array
      */
-    public function getGames()
+    protected function getRows()
     {
-        $games = GameQuery::create()
-            ->addAsColumn('id', 'Game.id')
-            ->addAsColumn('date', 'Game.date')
-            ->addAsColumn('player_count', 'Game.player_count')
-            ->useGamePlayerQuery()
-                ->usePlayerQuery()
-                    ->addAsColumn('player_name', 'GROUP_CONCAT(name SEPARATOR ", ")')
-                ->endUse()
-                ->groupByGameId()
-            ->endUse()
-            ->orderByDate(Criteria::DESC)
-            ->find()->toArray(null, false, TableMap::TYPE_FIELDNAME);
-        return $games;
-    }
-
-    /**
-     * @return Grid
-     */
-    protected function getGrid()
-    {
-        if ($this->grid === null) {
-            $grid = new Grid([
-                'emptyMessage' => 'There are no games.',
-                'id' => 'games',
-                'title' => 'Games'
-            ]);
-            $grid->addColumn(
-                new Grid\Column\IntegerColumn([
-                    'index' => 'id',
-                    'label' => 'Id',
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\Text([
-                    'index' => 'date',
-                    'label' => 'Date',
-                    'defaultSort' => true,
-                    'defaultSortDir' => 'DESC'
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\IntegerColumn([
-                    'index' => 'player_count',
-                    'label' => '# Players',
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\Text([
-                    'index' => 'player_name',
-                    'label' => 'Players',
-                ])
-            );
-            $grid->addColumn(
-                new Grid\Column\Edit([
-                    'index' => 'id',
-                    'label' => 'View',
-                    'sortable' => false,
-                    'url' => $this->request->getBaseUrl().'/game/view?id=',
-                ])
-            );
-
-            $grid->addButton(
-                'new',
-                new Grid\Button('Add New Game', $this->request->getBaseUrl().'/game/new')
-            );
-
-            $grid->setRows($this->getGames());
-            $this->grid = $grid;
+        $rows = [];
+        $games = $this->gameService->getGames();
+        foreach ($games as $game) {
+            $row = [];
+            /** @var \Wonders\Game $game  */
+            $row['id'] = $game->getId();
+            $row['date'] = $game->getDate('Y-m-d');
+            $playerNames = [];
+            $total = 0;
+            $winners = [];
+            foreach ($game->getGamePlayers() as $gamePlayer) {
+                $name = '<a href="'.$this->urlBuilder->getUrl('player/edit', ['id' => $gamePlayer->getPlayerId()])
+                    .'">'.$gamePlayer->getPlayer()->getName().'</a>';
+                $playerNames[] = $name;
+                if ($gamePlayer->getPlace() == 1) {
+                    $winners[] = $name;
+                }
+                $total += $gamePlayer->getPoints();
+            }
+            $row['player_count'] = $game->getPlayerCount();
+            $row['player_names'] = implode(', ', $playerNames);
+            $row['winner'] = implode(', ', $winners);
+            $row['total'] = $total;
+            $row['average'] = (count($playerNames)) ?  $total / count($playerNames) : 0;
+            $rows[] = $row;
         }
-        return $this->grid;
+        return $rows;
     }
 }

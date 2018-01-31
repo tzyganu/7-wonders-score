@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>7 Wonders {{ page_title|default('') }}</title>
+    <title>7 Wonders {% if page_title is defined %} - {{ page_title }}{% endif %}</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
@@ -24,6 +24,15 @@
 
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <!-- jQuery 3 -->
+    <script type="text/javascript" src="{{ asset('jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('datatable/js/dataTables.bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('jquery-ui/js/jquery-ui.min.js') }}"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script type="text/javascript">
+        jQuery.widget.bridge('uibutton', jQuery.ui.button);
+    </script>
     {% block head %}{% endblock %}
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
@@ -45,9 +54,17 @@
             </nav>
         </header>
         <!-- Control Sidebar -->
-        {% include 'misc/nav.html.twig' with {'session': session, 'nav_menu': nav_menu} %}
+        <aside class="main-sidebar">
+            <section class="sidebar">
+                {{ user_section()|raw }}
+                {% if selectedMenu is not defined %}
+                    {% set selectedMenu = [] %}
+                {% endif %}
+                {{ render_menu(selectedMenu)|raw }}
+            </section>
+        </aside>
         <div class="content-wrapper">
-            {{ flash_messages|raw }}
+            {{ flash_messages()|raw }}
             <section class="content">
                 {% block content %}{% endblock %}
             </section>
@@ -56,17 +73,10 @@
             <div class="pull-right hidden-xs">
                 Frontend powered by <a href="https://adminlte.io/">AdminLTE</a>
             </div>
-            <strong>Copyright &copy; 2017-2018 Marius Strajeru</strong>
+            <strong>7w score app {{ version() }} - Copyright &copy; 2017-2018 Marius Strajeru</strong>
         </footer>
     </div>
-    <!-- jQuery 3 -->
-    <script type="text/javascript" src="{{ asset('jquery/jquery.min.js') }}"></script>
     <!-- jQuery UI 1.11.4 -->
-    <script type="text/javascript" src="{{ asset('jquery-ui/js/jquery-ui.min.js') }}"></script>
-    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-    <script type="text/javascript">
-        jQuery.widget.bridge('uibutton', jQuery.ui.button);
-    </script>
     <!-- Bootstrap 3.3.7 -->
     <script type="text/javascript" href="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- Slimscroll -->
@@ -76,8 +86,6 @@
     <!-- AdminLTE App -->
     <script type="text/javascript" src="{{ asset('select2/js/select2.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/adminlte.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('datatable/js/jquery.dataTables.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('datatable/js/dataTables.bootstrap.js') }}"></script>
     {% block footer %}{% endblock %}
 </body>
 </html>

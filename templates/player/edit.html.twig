@@ -1,14 +1,14 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div>
-        <a href="{{ url('player/list')}}" class="btn btn-primary">Player List</a>
-    </div>
     <form id="player-form" action="{{ url('player/save') }}" method="post">
         <input type="hidden" name="id" value="{{ player.getId() }}" />
         <div class="box box-default">
             <div class="box-header with-border">
-                <h3 class="box-title">Player</h3>
+                <h3 class="box-title">{{ page_title }}</h3>
+                <div class="pull-right">
+                    <a href="{{ url('player/list')}}" class="btn btn-primary">Player List</a>
+                </div>
             </div>
             <div class="box-body">
                 <div class="row">

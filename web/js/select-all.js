@@ -15,7 +15,6 @@ $.widget('wonders.selectAll', {
         wrapper.addClass('col-lg-3');
         wrapper.append(checkbox);
         wrapper.append(label);
-        // checkbox.insertAfter($(this.element));
         if ($(this.element).find('option:not(:selected)').length == 0) {
             checkbox.prop('checked', true);
         }
@@ -26,7 +25,6 @@ $.widget('wonders.selectAll', {
             $(that.element).find('option').prop('selected', $(this).prop('checked'));
             $(that.element).trigger('change');
         });
-        // label.insertAfter(checkbox);
         wrapper.insertAfter($(this.element).parent());
     },
     getHtmlId: function () {

@@ -1,0 +1,43 @@
+{% extends "layout.html.twig" %}
+{% block head %}
+<script type="text/javascript" src="{{ asset('js/select-all.js') }}"></script>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Search Form</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form role="form" action="" method="get">
+                <div class="box-body">
+                    {% include 'misc/search/date.html.twig' with {search: search} %}
+                    {% for filter in filters %}
+                        {{ filter.render()|raw }}
+                    {% endfor %}
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+ <div class="row">
+     {{ grid|raw }}
+ </div>
+{% endblock %}
+{% block footer %}
+
+    <script type="text/javascript">
+        jQuery('select').select2();
+    </script>
+    {#{% include 'misc/grid-js.html.twig' with {'grid': grid} %}#}
+    {% include 'misc/search/date-js.html.twig' %}
+{% endblock %}

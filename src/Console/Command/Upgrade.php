@@ -1,14 +1,31 @@
 <?php
 namespace Console\Command;
 
+use Model\Console\CommandRunner;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 class Upgrade extends Command
 {
+    /**
+     * @var CommandRunner
+     */
+    private $commandRunner;
+
+    /**
+     * Upgrade constructor.
+     * @param CommandRunner $commandRunner
+     * @param null $name
+     */
+    public function __construct(
+        CommandRunner $commandRunner,
+        $name = null
+    ) {
+        $this->commandRunner = $commandRunner;
+        parent::__construct($name);
+    }
+
     /**
      * configure the command
      */
@@ -26,7 +43,7 @@ class Upgrade extends Command
     {
         return [
             'vendor/bin/propel model:build', //build propel classes
-            'vendor/bin/propel migrate', //upadte db
+            'vendor/bin/propel migrate', //update db
         ];
     }
 
@@ -37,10 +54,7 @@ class Upgrade extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        foreach ($this->getCommandsToRun() as $command) {
-            $output->writeln("Executing: ". '  '. $command);
-            passthru($command);
-        }
+        $this->commandRunner->run($this->getCommandsToRun(), $output, true);
         $output->writeln("Upgrade complete!");
     }
 }

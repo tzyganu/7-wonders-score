@@ -1,0 +1,39 @@
+options:
+  emptyMessage: There are no score categories.
+  id: categories
+  title: Score Categories
+columns:
+  id:
+    type: integer
+    index: getId
+    label: Id
+  icon:
+    type: icon
+    index: getIconClass
+    label: Icon
+  name:
+    type: text
+    index: getName
+    label: Name
+    defaultSort: true
+  sort_order:
+    type: integer
+    index: getSortOrder
+    label: Sort order
+    defaultSort: true
+  optional:
+    type: yesno
+    index: getOptional
+    label: Optional
+  edit:
+    type: link
+    index: getId
+    label: Edit
+    url: 'category/edit'
+    sortable: false
+    params:
+      id: getId
+buttons:
+  new:
+    label: Add new Score Category
+    url: 'category/new'

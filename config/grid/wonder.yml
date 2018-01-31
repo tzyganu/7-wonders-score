@@ -1,0 +1,25 @@
+options:
+  emptyMessage: There are no wonders. You cannot play withouy wonders
+  id: wonders
+  title: Wonders
+columns:
+  id:
+    type: integer
+    index: getId
+    label: Id
+  name:
+    type: text
+    index: getName
+    label: Name
+  edit:
+    type: link
+    index: getId
+    label: Edit
+    url: 'wonder/edit'
+    sortable: false
+    params:
+      id: getId
+buttons:
+  new:
+    label: Add new Wonder
+    url: 'game/wonder'

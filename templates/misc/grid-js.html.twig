@@ -1,7 +1,0 @@
-{% if grid is not null %}
-    <script type="text/javascript">
-        {% if grid.useDataTable()  %}
-        jQuery('#{{ grid.getId() }}').DataTable({{ grid.getDataTableConfig()|raw }});
-        {% endif %}
-    </script>
-{% endif %}

@@ -16,5 +16,6 @@ use Wonders\Base\User as BaseUser;
  */
 class User extends BaseUser
 {
-
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
 }

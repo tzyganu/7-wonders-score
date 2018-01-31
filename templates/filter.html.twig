@@ -1,0 +1,25 @@
+<div class="form-group">
+    <label for="filter-{{ name }}">{{ label }}</label>
+    <div class="row">
+        <div class="col-lg-9">
+            <select class="form-control" id="filter-{{ name }}" name="search[{{ name }}]{% if multiple %}[]{% endif %}" {% if multiple %}multiple{% endif %}>
+                {% for value in values %}
+                    <option value="{{ value.value }}" {% if value.value in selected %} selected="selected" {% endif %}>{{ value.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    {% if canGroup %}
+        <div class="row">
+            <div class="col-lg-9">
+                <input type="checkbox" name="search[group_by][{{ name }}]" id="filter-{{ name }}-group-by" {% if canGroupSelected %} checked{% endif %} value="1" />
+                <label for="filter-{{ name }}-group-by">Group by {{ label }}</label>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+        jQuery('#filter-{{ name }}').selectAll();
+    });
+</script>
