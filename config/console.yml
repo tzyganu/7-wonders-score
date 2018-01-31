@@ -1,4 +1,5 @@
 app-install: \Console\Command\Install
 create-user: \Console\Command\CreateUser
 app-upgrade: \Console\Command\Upgrade
-
+unit-tests: \Console\Command\Unit
+version: \Console\Command\Version

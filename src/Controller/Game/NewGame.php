@@ -3,53 +3,106 @@
 namespace Controller\Game;
 
 use Controller\AuthInterface;
-use Controller\OutputController;
+use Controller\ControllerInterface;
+use Model\PlayerCount;
 use Model\Side;
 use Propel\Runtime\Map\TableMap;
-use Wonders\Category;
-use Wonders\CategoryQuery;
+use Service\Player;
+use Service\Wonder;
+use Service\WonderGroup;
+use Symfony\Component\HttpFoundation\Request;
 use Wonders\Game;
-use Wonders\PlayerQuery;
-use Wonders\WonderQuery;
+use Wonders\WonderGroupWonder;
 
-class NewGame extends OutputController implements AuthInterface
+class NewGame implements AuthInterface, ControllerInterface
 {
-    protected $template = 'game/new.html.twig';
-
-    protected $selectedMenu = ['games', 'games-new'];
+    /**
+     * @var Request
+     */
+    private $request;
+    /**
+     * @var \Service\Category
+     */
+    private $categoryService;
+    /**
+     * @var Player
+     */
+    private $playerService;
+    /**
+     * @var Wonder
+     */
+    private $wonderService;
+    /**
+     * @var \Twig_Environment
+     */
+    private $twig;
+    /**
+     * @var Side
+     */
+    private $side;
+    /**
+     * @var string
+     */
+    private $template;
+    /**
+     * @var array
+     */
+    private $selectedMenu;
+    /**
+     * @var string
+     */
+    private $pageTitle;
+    /**
+     * @var WonderGroup
+     */
+    private $wonderGroupService;
 
     /**
-     * @return string
+     * NewGame constructor.
+     * @param Request $request
+     * @param \Service\Category $categoryService
+     * @param Player $playerService
+     * @param Wonder $wonderService
+     * @param \Twig_Environment $twig
+     * @param Side $side
+     * @param WonderGroup $wonderGroupService
+     * @param string $template
+     * @param array $selectedMenu
+     * @param string $pageTitle
      */
-    public function execute()
-    {
-        return $this->render([
-            'categories' => CategoryQuery::create()->orderBySortOrder()->find()->toArray(null, false, TableMap::TYPE_FIELDNAME),
-            'existing_players' => $this->getExistingPlayers(),
-            'wonders' => $this->getWonders(),
-            'sides' => $this->getSides(),
-            'game_date' => date('Y-m-d'),
-            'min_players' => Game::MIN_PLAYERS,
-            'max_players' => Game::MAX_PLAYERS,
-            'default_players' => Game::DEFAULT_PLAYERS
-        ]);
+    public function __construct(
+        Request $request,
+        \Service\Category $categoryService,
+        Player $playerService,
+        Wonder $wonderService,
+        \Twig_Environment $twig,
+        Side $side,
+        WonderGroup $wonderGroupService,
+        $template = '',
+        $selectedMenu = [],
+        $pageTitle = ''
+    ) {
+        $this->request              = $request;
+        $this->categoryService      = $categoryService;
+        $this->playerService        = $playerService;
+        $this->wonderService        = $wonderService;
+        $this->twig                 = $twig;
+        $this->side                 = $side;
+        $this->wonderGroupService   = $wonderGroupService;
+        $this->template             = $template;
+        $this->selectedMenu         = $selectedMenu;
+        $this->pageTitle            = $pageTitle;
     }
+
     /**
-     * @return array
+     * @return int
      */
-    private function getExistingPlayers()
+    private function getDefaultPlayers()
     {
-        $players = PlayerQuery::create()
-            ->orderByName()
-            ->find();
-        $playerArr = [];
-        foreach ($players as $player) {
-            $playerArr[] = [
-                'name' => $player->getName(),
-                'id' => $player->getId()
-            ];
+        if ($default = $this->request->get('players')) {
+            return (int)$default;
         }
-        return $playerArr;
+        return PlayerCount::DEFAULT_PLAYERS;
     }
 
     /**
@@ -57,25 +110,47 @@ class NewGame extends OutputController implements AuthInterface
      */
     private function getWonders()
     {
-        $wonders = WonderQuery::create()
-            ->orderByName()
-            ->find();
-        $wondersArr = [];
-        foreach ($wonders as $wonder) {
-            $wondersArr[] = [
+        $wonders = [];
+        foreach ($this->wonderService->getWonders() as $wonder) {
+            /** @var \Wonders\Wonder $wonder */
+            $item = [
+                'id' => $wonder->getId(),
                 'name' => $wonder->getName(),
-                'id' => $wonder->getId()
+                'groups' => []
             ];
+            $groups = $wonder->getWonderGroupWonders();
+            if ($groups) {
+                foreach ($groups as $group) {
+                    /** @var WonderGroupWonder $group */
+                    $item['groups'][] = $group->getWonderGroupId();
+                }
+            }
+            $wonders[] = $item;
         }
-        return $wondersArr;
+        return $wonders;
     }
 
     /**
-     * @return array
+     * @return string
      */
-    private function getSides()
+    public function execute()
     {
-        $sideModel = new Side();
-        return $sideModel->getSides();
+        return $this->twig->render(
+            $this->template,
+            [
+                'categories' => $this->categoryService->getCategories()->toArray(null, false, TableMap::TYPE_FIELDNAME),
+                'existing_players' => $this->playerService->getPlayers()
+                    ->toArray(null, false, TableMap::TYPE_FIELDNAME),
+                'wonders' => $this->getWonders(),
+                'sides' => $this->side->getSides(),
+                'wonderGroups' => $this->wonderGroupService->getWonderGroups(),
+                'game_date' => date('Y-m-d'),
+                'min_players' => PlayerCount::MIN_PLAYERS,
+                'max_players' => PlayerCount::MAX_PLAYERS,
+                'default_players' => $this->getDefaultPlayers(),
+                'page_title' => $this->pageTitle,
+                'selectedMenu' => $this->selectedMenu
+            ]
+        );
     }
 }

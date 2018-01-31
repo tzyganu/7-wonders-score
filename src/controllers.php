@@ -1,56 +1,70 @@
 <?php
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /** @var \Silex\Application $app */
 
-$yamlLoader = new  \Config\YamlLoader();
-
-$routesFile = '../config/routes.yml';
-$routes = $yamlLoader->load($routesFile);
-
-$diFile = '../config/di.yml';
-$diConfig = $yamlLoader->load($diFile);
-
 $request = Request::createFromGlobals();
-
 /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
 $session = $app['session'];
-
-$menuLoader = new \Model\MenuBuilder($yamlLoader, '../config/menu.yml', $request->getBaseUrl());
-
 /** @var \Twig_Environment $twig */
 $twig = $app['twig'];
-$defaultDiConfig = [
-    'twig' => $twig,
-    'request' => $request,
-    'session' => $session,
-    'menuBuilder' => $menuLoader
-];
-$di = new \Config\Di($defaultDiConfig, $diConfig);
+
+$factory = new \Model\Factory([
+    \Symfony\Component\HttpFoundation\Request::class => $request,
+    \Symfony\Component\HttpFoundation\Session\Session::class => $session,
+    \Twig_Environment::class => $twig
+]);
+/** @var \Config\YamlLoader $yamlLoader */
+$yamlLoader = $factory->create(\Config\YamlLoader::class);
+$menuLoader = $factory->get(
+    \Model\MenuBuilder::class,
+    [
+        'configFile' => PATH_ROOT.'/config/menu.yml',
+        'baseUrl' => $request->getBaseUrl()
+    ]
+);
+
+$functionsFile = PATH_ROOT.'/config/twig.yml';
+$twigFunctions = $yamlLoader->load($functionsFile);
+foreach ($twigFunctions as $name => $settings) {
+    if (!isset($settings['class'])) {
+        continue;
+    }
+    $class = $settings['class'];
+    $data = isset($settings['data']) ? $settings['data'] : [];
+    $function = $factory->create($class, $data);
+    if (!$function instanceof \Twig\FunctionInterface) {
+        continue;
+    }
+    $twig->addFunction($function->getFunction());
+}
+
+$routesFile = PATH_ROOT.'/config/routes.yml';
+$routes = $yamlLoader->load($routesFile);
 
 foreach ($routes as $route) {
     $method = $route['method'];
-    $controllerName = $route['controller'];
-    $args = [];
-    foreach ($route['dependencies'] as $dependency) {
-        $args[] = $di->getInstance($dependency);
-    }
-    $reflection = new \ReflectionClass($controllerName);
-    /** @var \Controller\BaseController $controller */
-    $controller = $reflection->newInstanceArgs($args);
-    if (!$controller instanceof \Controller\BaseController) {
-        throw  new \Exception(get_class($controller) . "is not an instance of " . \Controller\BaseController::class);
-    }
-    //web controller
     $app->$method(
         '/' . $route['bind'],
-        function () use ($session, $controller, $request, $route, $twig) {
+        function () use ($session, $request, $factory, $route) {
+            $controllerName = $route['controller'];
+            $data = [];
+            $vars = ['template', 'selectedMenu', 'pageTitle'];
+            foreach ($vars as $var) {
+                if (array_key_exists($var, $route)) {
+                    $data[$var] = $route[$var];
+                }
+            }
+            $controller = $factory->create($controllerName, $data);
+            if (!$controller instanceof \Controller\ControllerInterface) {
+                throw  new \Exception(get_class($controller) .
+                    " must implement " . \Controller\ControllerInterface::class);
+            }
             if ($controller instanceof \Controller\AuthInterface) {
                 if (!$session->get('user')) {
-                    $url = $request->getBaseUrl() . '/login';
+                    $url = $request->getBaseUrl() . '/login?back='.base64_encode($route['bind']);
                     return new RedirectResponse($url);
                 }
             }
@@ -59,19 +73,3 @@ foreach ($routes as $route) {
         }
     )->bind($route['bind']);
 }
-
-/*$app->error(function (\Exception $e, Request $request, $code) use ($app) {
-    if ($app['debug']) {
-        return;
-    }
-
-    // 404.html, or 40x.html, or 4xx.html, or error.html
-    $templates = array(
-        'errors/'.$code.'.html.twig',
-        'errors/'.substr($code, 0, 2).'x.html.twig',
-        'errors/'.substr($code, 0, 1).'xx.html.twig',
-        'errors/default.html.twig',
-    );
-
-    return new Response($app['twig']->resolveTemplate($templates)->render(array('code' => $code)), $code);
-});*/

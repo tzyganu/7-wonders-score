@@ -1,0 +1,8 @@
+render_menu:
+  class: \Twig\RenderMenu
+flash_message:
+  class: \Twig\FlashMessage
+user_section:
+  class: \Twig\UserSection
+version:
+  class: \Twig\Version

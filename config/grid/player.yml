@@ -1,0 +1,26 @@
+options:
+  emptyMessage: There are no players. You cannot play without players.
+  id: players
+  title: Players
+columns:
+  id:
+    type: integer
+    index: getId
+    label: Id
+  name:
+    type: text
+    index: getName
+    label: Name
+    defaultSort: true
+  edit:
+    type: link
+    index: getId
+    label: Edit
+    url: 'player/edit'
+    sortable: false
+    params:
+      id: getId
+buttons:
+  new:
+    label: Add new Player
+    url: 'player/new'

@@ -1,96 +1,112 @@
 <?php
 namespace Controller\Report\Stats;
 
-use Controller\ReportController;
+use Controller\ControllerInterface;
+use Controller\Report\StatsController;
+use Model\Filter\Factory;
 use Model\Grid;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Wonders\CategoryQuery;
-use Wonders\PlayerQuery;
+use Symfony\Component\HttpFoundation\Request;
 use Wonders\Score;
 
-class Category extends ReportController
+class Category extends StatsController implements ControllerInterface
 {
-    /**
-     * @var string
-     */
-    protected $template = 'report/category.html.twig';
-    /**
-     * @var array
-     */
-    protected $cache = [];
     /**
      * @var Grid
      */
     protected $grid;
+    /**
+     * @var \Service\Score
+     */
+    private $scorerService;
 
     /**
-     * @param $vars
-     * @return array
+     * Category constructor.
+     * @param Request $request
+     * @param Grid\Factory $gridFactory
+     * @param Grid\Column\Factory $columnFactory
+     * @param \Twig_Environment $twig
+     * @param Factory $filterFactory
+     * @param \Service\Score $scoreService
+     * @param string $template
+     * @param array $selectedMenu
+     * @param string $pageTitle
      */
-    public function getAllVars($vars)
-    {
-        $filters = $this->getFilters();
-        $vars = parent::getAllVars($vars);
-        $vars['search'] = [
-            'player_count' => $this->getPlayerCounts(),
-            'players' => $this->getPlayers(),
-            'categories' => $this->getCategories(),
-            'values' => [
-                'date' => [
-                    'start' => isset($filters['date']['start']) ? $filters['date']['start'] : '',
-                    'end' => isset($filters['date']['end']) ? $filters['date']['end'] : ''
-                ],
-                'player_id' => isset($filters['player_id']) ? $filters['player_id'] : '',
-                'category_id' => isset($filters['category_id']) ? $filters['category_id'] : '',
-                'player_count' => isset($filters['player_count']) ? $filters['player_count'] : '',
-            ]
-        ];
-
-        return $vars;
+    public function __construct(
+        Request $request,
+        \Model\Grid\Factory $gridFactory,
+        \Model\Grid\Column\Factory $columnFactory,
+        \Twig_Environment $twig,
+        Factory $filterFactory,
+        \Service\Score $scoreService,
+        $template = '',
+        array $selectedMenu = [],
+        $pageTitle = ''
+    ) {
+        $this->scorerService = $scoreService;
+        parent::__construct(
+            $request,
+            $gridFactory,
+            $columnFactory,
+            $twig,
+            $filterFactory,
+            $template,
+            $selectedMenu,
+            $pageTitle
+        );
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    protected function getFilters()
+    protected function getFilterKeys()
     {
-        return $this->request->get('search', null);
+        return [
+            Factory::PLAYER_FILTER,
+            Factory::CATEGORY_FILTER,
+            Factory::NUMBER_FILTER
+        ];
     }
 
     /**
      * @return string
      */
-    protected function getGridTitle()
+    private function getGridTitle()
     {
         return 'Score Category Stats';
     }
 
     /**
-     * @param $key
      * @return bool
      */
-    protected function isSpecificFilter($key)
+    private function canShowPlayerColumn()
     {
-        $filters = $this->getFilters();
-        return (isset($filters[$key]) && is_array($filters[$key]) && count($filters) > 0);
+        return $this->isGroupBy('player_id');
     }
 
     /**
      * @return bool
      */
-    protected function canShowPlayerColumn()
+    private function canShowCategoryColumn()
     {
-        return $this->isSpecificFilter('player_id');
+        return $this->isGroupBy('category_id');
     }
 
     /**
      * @return bool
      */
-    protected function canShowCategoryColumn()
+    private function canShowPlayerCountColumn()
     {
-        return $this->isSpecificFilter('category_id');
+        return $this->isGroupBy('player_count');
     }
 
+    /**
+     * @return bool
+     */
+    private function canShowSideColumn()
+    {
+        return $this->isGroupBy('side');
+    }
 
     /**
      * @return Grid|null
@@ -101,9 +117,8 @@ class Category extends ReportController
         if ($filters === null) {
             return null;
         }
-
         if ($this->grid === null) {
-            $grid = new Grid([
+            $grid = $this->gridFactory->create([
                 'emptyMessage' => 'There is no data so far for this report',
                 'id' => 'stats',
                 'title' => $this->getGridTitle(),
@@ -111,7 +126,7 @@ class Category extends ReportController
             ]);
             if ($this->canShowPlayerColumn()) {
                 $grid->addColumn(
-                    new Grid\Column\Text([
+                    $this->columnFactory->create([
                         'index' => 'player_name',
                         'label' => 'Player'
                     ])
@@ -119,38 +134,53 @@ class Category extends ReportController
             }
             if ($this->canShowCategoryColumn()) {
                 $grid->addColumn(
-                    new Grid\Column\Text([
+                    $this->columnFactory->create([
                         'index' => 'category_name',
                         'label' => 'Score Category'
                     ])
                 );
             }
+
+            if ($this->canShowPlayerCountColumn()) {
+                $grid->addColumn(
+                    $this->columnFactory->create([
+                        'type' => 'integer',
+                        'index' => 'player_count',
+                        'label' => '# of Players'
+                    ])
+                );
+            }
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'played',
-                    'label' => 'Times played',
+                    'label' => 'Categories Played',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'total_points',
                     'label' => 'Total Points',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\DecimalColumn([
+                $this->columnFactory->create([
+                    'type' => 'decimal',
                     'index' => 'average',
-                    'label' => 'Average',
+                    'label' => 'Average per category',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'max',
                     'label' => 'Max Points',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'min',
                     'label' => 'Min Points',
                 ])
@@ -166,53 +196,37 @@ class Category extends ReportController
      *
      * @return array
      */
-    protected function getRows()
+    private function getRows()
     {
-        $scores = \Wonders\ScoreQuery::create();
+        $queryFilters = [];
         $filters = $this->getFilters();
         if ($this->isSpecificFilter('player_id')) {
-            $scores->filterByPlayerId($filters['player_id'], Criteria::IN);
+            $queryFilters['PlayerId'] = [$filters['player_id'], Criteria::IN];
         }
         if ($this->isSpecificFilter('category_id')) {
-            $scores->filterByCategoryId($filters['category_id'], Criteria::IN);
+            $queryFilters['CategoryId'] = [$filters['category_id'], Criteria::IN];
         }
-        if (isset($filters['date']['start']) && !empty($filters['date']['start'])) {
-            $scores->useGameQuery()
-                ->filterByDate($filters['date']['start'], Criteria::GREATER_EQUAL)
-                ->endUse();
-        }
-        if (isset($filters['date']['end']) && !empty($filters['date']['end'])) {
-            $scores->useGameQuery()
-                ->filterByDate($filters['date']['end'], Criteria::LESS_EQUAL)
-                ->endUse();
+        if (isset($filters['date'])) {
+            $queryFilters['_game']['date'] = $filters['date'];
         }
         if (isset($filters['player_count']) && !empty($filters['player_count'])) {
-            $scores->useGameQuery()
-                ->filterByPlayerCount($filters['player_count'], Criteria::IN)
-                ->endUse();
+            $queryFilters['_game']['player_count'] = [$filters['player_count'], Criteria::IN];
         }
-        $players = $this->getPlayers();
-        $playersById = [];
-        foreach ($players as $player) {
-            $playersById[$player['value']] = $player['label'];
-        }
-
-        $categories = $this->getCategories();
-        $categoriesById = [];
-        foreach ($categories as $category) {
-            $categoriesById[$category['value']] = '<span class="'.$category['icon'].'"></span> '.$category['label'];
-        }
+        $gamePlayers = $this->scorerService->getScores($queryFilters);
         $rows = [];
-        foreach ($scores as $score) {
-            /** @var Score $score */
+        foreach ($gamePlayers as $score) {
+            /** @var Score $score$ */
             $key = $this->getRowKey($score);
             if (!isset($rows[$key])) {
                 $initRow = [];
                 if ($this->canShowPlayerColumn()) {
-                    $initRow['player_name'] = $playersById[$score->getPlayerId()];
+                    $initRow['player_name'] = $score->getPlayer()->getName();
                 }
                 if ($this->canShowCategoryColumn()) {
-                    $initRow['category_name'] = $categoriesById[$score->getCategoryId()];
+                    $initRow['category_name'] = $score->getCategory()->getName();
+                }
+                if ($this->canShowPlayerCountColumn()) {
+                    $initRow['player_count'] = $score->getGame()->getPlayerCount();
                 }
                 $initRow['played'] = 0;
                 $initRow['total_points'] = 0;
@@ -240,59 +254,23 @@ class Category extends ReportController
     }
 
     /**
-     * determing grouping
+     * determine grouping
      *
      * @param Score $row
      * @return string
      */
-    protected function getRowKey(Score $row)
+    private function getRowKey(Score $row)
     {
         $keyParts = ['_'];
-        if ($this->isSpecificFilter('player_id')) {
+        if ($this->isGroupBy('player_id')) {
             $keyParts[] = $row->getPlayerId();
         }
-        if ($this->isSpecificFilter('category_id')) {
+        if ($this->isGroupBy('category_id')) {
             $keyParts[] = $row->getCategoryId();
         }
+        if ($this->isGroupBy('player_count')) {
+            $keyParts[] = $row->getGame()->getPlayerCount();
+        }
         return implode('_', $keyParts);
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getPlayers()
-    {
-        if (!isset($this->cache['players'])) {
-            $players = PlayerQuery::create()->orderByName()->find();
-            $values = [];
-            foreach ($players as $player) {
-                $values[] = [
-                    'label' => $player->getName(),
-                    'value' => $player->getId()
-                ];
-            }
-            $this->cache['players'] = $values;
-        }
-        return $this->cache['players'];
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getCategories()
-    {
-        if (!isset($this->cache['categories'])) {
-            $categories = CategoryQuery::create()->orderBySortOrder()->find();
-            $values = [];
-            foreach ($categories as $category) {
-                $values[] = [
-                    'label' => $category->getName(),
-                    'value' => $category->getId(),
-                    'icon' => $category->getIconClass()
-                ];
-            }
-            $this->cache['categories'] = $values;
-        }
-        return $this->cache['categories'];
     }
 }

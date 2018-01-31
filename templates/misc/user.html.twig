@@ -1,0 +1,24 @@
+<div class="user-panel">
+    <div class="pull-left image">
+        <img src="{{ asset('img/7w.jpeg') }}" class="img-circle" alt="7 Wonders">
+    </div>
+    <div class="pull-left info">
+        <p>7 Wonders</p>
+        {% if session.get('user') %}
+            <a href="#">
+                <i class="fa fa-circle text-success"></i>
+                {{ session.get('user').username }}
+            </a>
+            <br />
+            <a href="{{ url('logout') }}">
+                <i class="fa fa-sign-out"></i>
+                Logout
+            </a>
+        {% else %}
+            <a href="{{ url('login') }}">
+                <i class="fa fa-sign-in"></i>
+                Login
+            </a>
+        {% endif %}
+    </div>
+</div>

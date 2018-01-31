@@ -35,7 +35,8 @@ abstract class Column
      * Column constructor.
      * @param array $options
      */
-    public function __construct(array $options) {
+    public function __construct(array $options)
+    {
         $fields = $this->getConstructorOptionsFields();
         foreach ($fields as $field) {
             if (isset($options[$field])) {
@@ -81,7 +82,6 @@ abstract class Column
         } else {
             throw new \Exception("Row must be object or array");
         }
-
         return $this->formatValue($realValue);
     }
 

@@ -1,43 +1,145 @@
 <?php
 namespace Controller\Game;
 
-use Controller\GridController;
-use Controller\OutputController;
+use Controller\ControllerInterface;
+use Model\FlashMessage;
 use Model\Grid;
+use Model\Grid\Factory as GridFactory;
+use Model\Grid\Column\Factory as ColumnFactory;
+use Model\Grid\Button\Factory as ButtonFactory;
+use Model\ResponseFactory;
+use Model\UrlBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Wonders\Game;
-use Wonders\GameCategory;
-use Wonders\GameQuery;
 use Wonders\Score;
 
-class ViewGame extends GridController
+class ViewGame implements ControllerInterface
 {
-    /**
-     * @var string
-     */
-    protected $selectedMenu = 'games';
     /**
      * @var Grid
      */
-    protected $grid;
-
+    private $grid;
     /**
      * @var Game
      */
-    protected $game;
+    private $game;
+    /**
+     * @var GridFactory
+     */
+    private $gridFactory;
+    /**
+     * @var ButtonFactory
+     */
+    private $buttonFactory;
+    /**
+     * @var ColumnFactory
+     */
+    private $columnFactory;
+    /**
+     * @var \Service\Game
+     */
+    private $gameService;
+    /**
+     * @var Request
+     */
+    private $request;
+    /**
+     * @var \Twig_Environment
+     */
+    private $twig;
+    /**
+     * @var string
+     */
+    private $template;
+    /**
+     * @var array
+     */
+    private $selectedMenu;
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+    /**
+     * @var UrlBuilder
+     */
+    private $urlBuilder;
+    /**
+     * @var FlashMessage
+     */
+    private $flashMessage;
+
+    /**
+     * ViewGame constructor.
+     * @param Request $request
+     * @param \Twig_Environment $twig
+     * @param GridFactory $gridFactory
+     * @param ColumnFactory $columnFactory
+     * @param ButtonFactory $buttonFactory
+     * @param \Service\Game $gameService
+     * @param ResponseFactory $responseFactory
+     * @param FlashMessage $flashMessage
+     * @param UrlBuilder $urlBuilder
+     * @param string $template
+     * @param array $selectedMenu
+     */
+    public function __construct(
+        Request $request,
+        \Twig_Environment $twig,
+        GridFactory $gridFactory,
+        ColumnFactory $columnFactory,
+        ButtonFactory $buttonFactory,
+        \Service\Game $gameService,
+        ResponseFactory $responseFactory,
+        FlashMessage $flashMessage,
+        UrlBuilder $urlBuilder,
+        $template = '',
+        array $selectedMenu = []
+    ) {
+        $this->gridFactory      = $gridFactory;
+        $this->buttonFactory    = $buttonFactory;
+        $this->columnFactory    = $columnFactory;
+        $this->gameService      = $gameService;
+        $this->request          = $request;
+        $this->twig             = $twig;
+        $this->responseFactory  = $responseFactory;
+        $this->flashMessage     = $flashMessage;
+        $this->urlBuilder       = $urlBuilder;
+        $this->template         = $template;
+        $this->selectedMenu     = $selectedMenu;
+    }
+
+    /**
+     * @return string
+     */
+    public function execute()
+    {
+        $game = $this->getGame();
+        if ($this->getGame() === null) {
+            $this->flashMessage->addErrorMessage("The game you are looking for does not exist");
+            return $this->responseFactory->create(
+                ResponseFactory::REDIRECT,
+                ['url' => $this->urlBuilder->getUrl('game/list')]
+            );
+        }
+        return $this->twig->render(
+            $this->template,
+            [
+                'page_title' => 'View game '.$game->getId().': '.$game->getDate('Y-m-d'),
+                'selectedMenu' => $this->selectedMenu,
+                'content' => $this->getGrid()->render()
+            ]
+        );
+    }
 
     /**
      * @return Game
      */
-    protected function getGame()
+    private function getGame()
     {
         if ($this->game === null) {
             $id = $this->request->get('id');
             if ($id) {
-                $this->game = GameQuery::create()
-                    ->findOneById($id);
-            } else {
-                $this->game = new Game();
+                $this->game = $this->gameService->getGame($id);
             }
         }
         return $this->game;
@@ -61,7 +163,7 @@ class ViewGame extends GridController
     /**
      * @return array
      */
-    protected function getRows()
+    private function getRows()
     {
         $game = $this->getGame();
         $rows = [];
@@ -91,24 +193,26 @@ class ViewGame extends GridController
     /**
      * @return Grid
      */
-    protected function getGrid()
+    private function getGrid()
     {
         if ($this->grid === null) {
             $game = $this->getGame();
-            $grid = new Grid([
+            $grid = $this->gridFactory->create([
                 'emptyMessage' => 'Something went wrong here',
                 'id' => 'game',
                 'title' => 'Game '.$game->getId().' : '.$game->getDate('Y-m-d')
             ]);
             $grid->addColumn(
-                new Grid\Column\Text([
+                $this->columnFactory->create([
+                    'type' => 'text',
                     'index' => 'name',
                     'label' => ''
                 ])
             );
             foreach ($game->getGameCategories() as $category) {
                 $grid->addColumn(
-                    new Grid\Column\IntegerColumn([
+                    $this->columnFactory->create([
+                        'type' => 'integer',
                         'index' => $category->getCategory()->getId(),
                         'label' => $category->getCategory()->getName(),
                         'iconClass' => $category->getCategory()->getIconClass()
@@ -116,23 +220,24 @@ class ViewGame extends GridController
                 );
             }
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'total',
                     'label' => 'Total',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'rank',
                     'label' => 'Rank',
                     'defaultSort' => true
                 ])
             );
 
-
             $grid->addButton(
                 'new',
-                new Grid\Button('Game List', $this->request->getBaseUrl().'/game/list')
+                $this->buttonFactory->create(['label' => 'Game List', 'url' => 'game/list'])
             );
 
             $grid->setRows($this->getRows());

@@ -1,30 +1,56 @@
 <?php
 namespace Model\Grid;
 
+use Model\UrlBuilder;
+use Symfony\Component\HttpFoundation\Request;
+
 class Button
 {
     const DEFAULT_CLASS = 'btn btn-primary';
     /**
      * @var string
      */
-    protected $url;
+    private $url;
     /**
      * @var string
      */
-    protected $class;
+    private $class;
     /**
      * @var string
      */
-    protected $label;
+    private $label;
+    /**
+     * @var Request
+     */
+    private $request;
+    /**
+     * @var array
+     */
+    private $params;
+    /**
+     * @var UrlBuilder
+     */
+    private $urlBuilder;
 
     /**
      * Button constructor.
+     * @param Request $request
+     * @param UrlBuilder $urlBuilder
      * @param $label
      * @param $url
      * @param null $class
+     * @param array $params
      */
-    public function __construct($label, $url, $class = null)
-    {
+    public function __construct(
+        Request $request,
+        UrlBuilder $urlBuilder,
+        $label,
+        $url,
+        $class = null,
+        $params = []
+    ) {
+        $this->request      = $request;
+        $this->urlBuilder   = $urlBuilder;
         $this->setLabel($label);
         $this->setUrl($url);
         if ($class !== null) {
@@ -32,6 +58,7 @@ class Button
         } else {
             $this->setClass(self::DEFAULT_CLASS);
         }
+        $this->params = $params;
     }
 
     /**
@@ -39,7 +66,7 @@ class Button
      */
     public function getUrl()
     {
-        return $this->url;
+        return $this->urlBuilder->getUrl($this->url, $this->params);
     }
 
     /**

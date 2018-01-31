@@ -1,3 +1,7 @@
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
 $.widget('wonders.game', {
     /**
      * widget options
@@ -21,9 +25,6 @@ $.widget('wonders.game', {
         $(this.options.addPlayerTrigger).on('click', function(e) {
             e.preventDefault();
             that.addPlayer(true);
-            if (!that.canAddPlayer()) {
-                $(this).attr('disabled', 'disabled');
-            }
         });
         var defaultPlayers = this.options.defaultPlayers;
         if (defaultPlayers < this.options.minPlayers) {
@@ -44,10 +45,14 @@ $.widget('wonders.game', {
         });
         if (this.options.randomizeWondersTrigger) {
             this.options.randomizeWondersTrigger.on('click', function() {
-                var wonders = that.options.wonders;
+                var wonders = that.getValidWonders();
                 that.shuffle(wonders);
                 var wonderSelects = $(that.element).find('select.wonder-select');
                 for (var i = 0; i < wonderSelects.length; i++) {
+                    if (typeof wonders[i] === "undefined") {
+                        alert('Not enough wonders for all the players! Need more wonders!');
+                        break;
+                    }
                     $(wonderSelects[i]).val(wonders[i].id).trigger('change');
                 }
             });
@@ -56,12 +61,111 @@ $.widget('wonders.game', {
             this.options.randomizeSidesTrigger.on('click', function() {
                 var sides = that.options.sides;
                 var sideSelects = $(that.element).find('select.side-select');
-                for (var i = 0; i < sideSelects.length; i++) {
-                    that.shuffle(sides);
-                    $(sideSelects[i]).val(sides[0].id).trigger('change');
+                var max = Math.pow(2, sideSelects.length) - 1;
+                var min = 0;
+                var random = Math.floor(Math.random() * (max - min + 1)) + min;
+                random = random.toString(2);
+                var totalSides = sideSelects.length;
+                var pad = '';
+                for (var i = 0;i<totalSides;i++) {
+                    pad += '0';
+                }
+                random = pad.substring(0, pad.length - random.length) + random;
+                for (i = 0; i < totalSides; i++) {
+                    var side = (typeof random[i] == "undefined") ? 0 : random[i];
+                    $(sideSelects[i]).val(sides[side].id).trigger('change');
                 }
             });
         }
+        if (this.options.wonderGroupsTrigger) {
+            this.options.wonderGroupsTrigger.selectAll();
+            this.options.wonderGroupsTrigger.on('change', function() {
+                $('.wonder-select').each(function(index) {
+                    var currentValue = $(this).val();
+                    $(this).html('');
+                    var dummy = that.generateSelect(
+                        'wonder[' + index + ']',
+                        that.getValidWonders(),
+                        {'id': 0, 'name': '--Wonder--'}
+                    );
+                    $(this).html(dummy.html());
+                    $(this).val(currentValue);
+                    $(this).trigger('change');
+                });
+                // var currentValue = $(this).val();
+                //
+                // for (var i = 0;i< that.options.wonders.length; i++) {
+                //     var diff = $(that.options.wonders[i].groups).filter(currentValue);
+                //     var wonders = $('.wonder-select').find('option[value=' + that.options.wonders[i].id + ']');
+                //     if (diff.length == 0) {
+                //         wonders.remove();
+                //     } else if (wonders.length == 0) {
+                //         $('.wonder-select').append('<option value="' + that.options.wonders[i].id + '">' + that.options.wonders[i].name + '</option>');
+                //     }
+                // }
+            });
+        }
+        this.attachValidation();
+    },
+    attachValidation: function() {
+        var that = this;
+        window.addEventListener('load', function() {
+            var form = $(that.element).closest('form');
+            form.on('submit', function(event) {
+                if (!that.validateForm(this)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            });
+        }, false);
+    },
+    getValidWonders: function() {
+        var groupTrigger = $(this.options.wonderGroupsTrigger);
+        if (groupTrigger.length === 0) {
+            return this.options.wonders;
+        }
+        var validWonders = [];
+        var groupsValue = groupTrigger.val();
+        groupsValue = groupsValue.map(x => parseInt(x));
+        for (var i = 0;i< this.options.wonders.length; i++) {
+            var diff = $(this.options.wonders[i].groups).filter(groupsValue);
+            if (diff.length !== 0) {
+                validWonders.push(this.options.wonders[i]);
+            }
+        }
+        return validWonders;
+    },
+    validateForm: function(form) {
+        //validate wonders
+        var wonders = $('.wonder-select');
+        var wonderValues = {};
+        for (var i = 0;i<wonders.length;i++) {
+            var val = $(wonders[i]).val();
+            if (!val) {
+                continue;
+            }
+            if (typeof wonderValues[val] != "undefined") {
+                alert('You cannot have 2 players play with the same wonder');
+                return false;
+            }
+            wonderValues[val] = val;
+        }
+
+        //validate players
+        var players = $('.player-select');
+        var playerValues = {};
+        for (i = 0;i<players.length;i++) {
+            val = $(players[i]).val();
+            if (!val) {
+                continue;
+            }
+            if (typeof playerValues[val] != "undefined") {
+                alert('You cannot have 2 times the same player');
+                return false;
+            }
+            playerValues[val] = val;
+        }
+        return true;
     },
     shuffle: function (array) {
         var m = array.length, t, i;
@@ -129,6 +233,9 @@ $.widget('wonders.game', {
         this.players[this.playerIndex] = tr;
         $('select').select2();
         this.playerIndex++;
+        if (!that.canAddPlayer()) {
+            $(this).attr('disabled', 'disabled');
+        }
     },
     calculateTotal: function (tr) {
         var scoringInputs = $(tr).find('.edit-score input');
@@ -187,6 +294,7 @@ $.widget('wonders.game', {
             this.options.registeredPlayers,
             {'id':0, 'name':'--New Player--'}
         );
+        select.addClass('player-select');
 
         line1.append(select);
 

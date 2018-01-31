@@ -2,36 +2,100 @@
 namespace Controller\Wonder;
 
 use Controller\AuthInterface;
-use Controller\BaseController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Controller\ControllerInterface;
+use Model\Factory\WonderFactory;
+use Model\FlashMessage;
+use Model\ResponseFactory;
+use Model\UrlBuilder;
+use Symfony\Component\HttpFoundation\Request;
 use Wonders\Wonder;
-use Wonders\WonderQuery;
 
-class SaveWonder extends BaseController implements AuthInterface
+class SaveWonder implements AuthInterface, ControllerInterface
 {
     /**
-     * @return RedirectResponse
+     * @var Request
+     */
+    private $request;
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+    /**
+     * @var \Service\Wonder
+     */
+    private $wonderService;
+    /**
+     * @var FlashMessage
+     */
+    private $flashMessage;
+    /**
+     * @var WonderFactory
+     */
+    private $wonderFactory;
+    /**
+     * @var UrlBuilder
+     */
+    private $urlBuilder;
+
+    /**
+     * SaveWonder constructor.
+     * @param Request $request
+     * @param ResponseFactory $responseFactory
+     * @param \Service\Wonder $wonderService
+     * @param WonderFactory $wonderFactory
+     * @param UrlBuilder $urlBuilder
+     * @param FlashMessage $flashMessage
+     */
+    public function __construct(
+        Request $request,
+        ResponseFactory $responseFactory,
+        \Service\Wonder $wonderService,
+        WonderFactory $wonderFactory,
+        UrlBuilder $urlBuilder,
+        FlashMessage $flashMessage
+    ) {
+        $this->request          = $request;
+        $this->responseFactory  = $responseFactory;
+        $this->wonderService    = $wonderService;
+        $this->wonderFactory    = $wonderFactory;
+        $this->urlBuilder       = $urlBuilder;
+        $this->flashMessage     = $flashMessage;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function execute()
     {
         $id = $this->request->get('id');
         try {
             if ($id) {
-                $wonder = WonderQuery::create()
-                    ->findOneById($id);
+                $wonder = $this->wonderService->getWonder($id);
+                if (!$wonder) {
+                    throw new \Exception("Wonder with id {$id} does not exist");
+                }
             } else {
-                $wonder = new Wonder();
+                $wonder = $this->wonderFactory->create();
             }
             $wonder->setName($this->request->get('name'));
-            $wonder->save();
-            $this->addFlashMessage(self::FLASH_MESSAGE_SUCCESS, 'The wonder was saved');
-            return new RedirectResponse($this->request->getBaseUrl().'/wonder/list');
+            $this->wonderService->save($wonder);
+            $this->flashMessage->addSuccessMessage("The wonder was saved");
+            return $this->responseFactory->create(
+                ResponseFactory::REDIRECT,
+                [
+                    'url' => $this->urlBuilder->getUrl('wonder/list')
+                ]
+            );
         } catch (\Exception $e) {
-            $this->addFlashMessage(self::FLASH_MESSAGE_ERROR, $e->getMessage());
-            if ($id) {
-                return new RedirectResponse($this->request->getBaseUrl() . '/wonder/edit?id=' . $id);
-            }
-            return new RedirectResponse($this->request->getBaseUrl() . '/wonder/edit');
+            $this->flashMessage->addErrorMessage($e->getMessage());
+            $url = ($id) ? '/wonder/edit' : '/wonder/new';
+            $params = ($id) ? ['id' => $id] : [];
+            return $this->responseFactory->create(
+                ResponseFactory::REDIRECT,
+                [
+                    'url' => $this->urlBuilder->getUrl($url, $params)
+                ]
+            );
         }
     }
 }

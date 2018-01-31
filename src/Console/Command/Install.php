@@ -1,16 +1,56 @@
 <?php
 namespace Console\Command;
 
+use Model\Console\CommandRunner;
+use Model\Console\QuestionFactory;
+use Model\File\Io;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 class Install extends Command
 {
     const PROPEL_FILE = "propel.yml";
     const PROPEL_DIST_FILE = "propel.yml.dist";
+    /**
+     * @var CommandRunner
+     */
+    private $commandRunner;
+    /**
+     * @var QuestionFactory
+     */
+    private $questionFactory;
+    /**
+     * @var QuestionHelper
+     */
+    private $questionHelper;
+    /**
+     * @var Io
+     */
+    private $io;
+
+    /**
+     * Install constructor.
+     * @param CommandRunner $commandRunner
+     * @param QuestionFactory $questionFactory
+     * @param QuestionHelper $questionHelper
+     * @param Io $io
+     * @param null $name
+     */
+    public function __construct(
+        CommandRunner $commandRunner,
+        QuestionFactory $questionFactory,
+        QuestionHelper $questionHelper,
+        Io $io,
+        $name = null
+    ) {
+        $this->commandRunner   = $commandRunner;
+        $this->questionFactory = $questionFactory;
+        $this->questionHelper  = $questionHelper;
+        $this->io              = $io;
+        parent::__construct($name);
+    }
 
     /**
      * configure the command
@@ -85,17 +125,21 @@ class Install extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (file_exists(self::PROPEL_FILE)) {
+        if ($this->io->fileExists(self::PROPEL_FILE)) {
             $output->writeln("The application is already installed");
             return ;
         }
-        /** @var QuestionHelper $questionHelper */
-        $questionHelper = $this->getHelper('question');
+        $questionHelper = $this->questionHelper;
         $answers = [
             '{ROOT_DIR}' => dirname(dirname(dirname(__DIR__))),
         ];
         foreach ($this->getQuestions() as $key => $question) {
-            $q = new Question($question['question']. '(default: '.$question['default'].')', $question['default']);
+            $q = $this->questionFactory->create(
+                [
+                    'question' => $question['question']. '(default: '.$question['default'].')',
+                    'default' => $question['default']
+                ]
+            );
             if (isset($question['hidden']) && $question['hidden']) {
                 $q->setHidden(true);
                 $q->setHiddenFallback(true);
@@ -104,14 +148,11 @@ class Install extends Command
         }
         foreach ($this->getConfigFilesMap() as $file) {
             $source = $file . '.sample';
-            $content = file_get_contents($source);
+            $content = $this->io->getContents($source);
             $content = str_replace(array_keys($answers), array_values($answers), $content);
-            file_put_contents($file, $content);
+            $this->io->putContents($file, $content);
         }
-        foreach ($this->getCommandsToRun() as $command) {
-            $output->writeln("Executing: ". '  '. $command);
-            passthru($command);
-        }
+        $this->commandRunner->run($this->getCommandsToRun(), $output, true);
         $output->writeln("Installation complete!");
     }
 }

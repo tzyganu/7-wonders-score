@@ -19,9 +19,9 @@ players:
     list:
       label: Player List
       url: player/list
-    edit:
+    new:
       label: New Player
-      url: player/edit
+      url: player/new
 wonders:
   label: Wonders
   icon: glyphicon glyphicon-triangle-top
@@ -29,9 +29,15 @@ wonders:
     list:
       label: Wonder List
       url: wonder/list
-    edit:
+    new:
       label: New Wonder
-      url: wonder/edit
+      url: wonder/new
+    group-list:
+      label: Wonder Group List
+      url: wonder-group/list
+    group-new:
+      label: New Wonder Group
+      url: wonder-group/new
 categories:
   label: Score Categories
   icon: fa fa-superpowers
@@ -39,9 +45,9 @@ categories:
     list:
       label: Score Category List
       url: category/list
-    edit:
+    new:
       label: New Score Category
-      url: category/edit
+      url: category/new
 reports:
   label: Reports
   icon: fa fa-table

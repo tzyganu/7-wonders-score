@@ -18,6 +18,10 @@ $app->register(new TwigServiceProvider(), array(
         'cache' => false,
     )));
 $app->register(new HttpFragmentServiceProvider());
-$app->register(new Silex\Provider\SessionServiceProvider());
+$app->register(new Silex\Provider\SessionServiceProvider([]));
+
+$app['session.storage.options'] = [
+    'cookie_lifetime' => 36000
+];
 
 return $app;

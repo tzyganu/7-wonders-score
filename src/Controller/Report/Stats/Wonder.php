@@ -1,113 +1,106 @@
 <?php
 namespace Controller\Report\Stats;
 
-use Controller\ReportController;
+use Controller\ControllerInterface;
+use Controller\Report\StatsController;
+use Model\Filter\Factory;
 use Model\Grid;
-use Model\Side;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\HttpFoundation\Request;
 use Wonders\GamePlayer;
-use Wonders\PlayerQuery;
-use Wonders\WonderQuery;
 
-class Wonder extends ReportController
+class Wonder extends StatsController implements ControllerInterface
 {
-    /**
-     * @var string
-     */
-    protected $template = 'report/wonder.html.twig';
-    /**
-     * @var array
-     */
-    protected $cache = [];
     /**
      * @var Grid
      */
     protected $grid;
-
-    protected $selectedMenu = ['reports', 'reports-wonder'];
-
     /**
-     * @param $vars
-     * @return array
+     * @var \Service\GamePlayer
      */
-    public function getAllVars($vars)
-    {
-        $filters = $this->getFilters();
-        $vars = parent::getAllVars($vars);
-        $vars['search'] = [
-            'players' => $this->getPlayers(),
-            'wonders' => $this->getWonders(),
-            'player_count' => $this->getPlayerCounts(),
-            'sides' => $this->getSides(),
-            'values' => [
-                'date' => [
-                    'start' => isset($filters['date']['start']) ? $filters['date']['start'] : '',
-                    'end' => isset($filters['date']['end']) ? $filters['date']['end'] : ''
-                ],
-                'player_id' => isset($filters['player_id']) ? $filters['player_id'] : '',
-                'wonder_id' => isset($filters['wonder_id']) ? $filters['wonder_id'] : '',
-                'side' => isset($filters['side']) ? $filters['side'] : '',
-                'player_count' => isset($filters['player_count']) ? $filters['player_count'] : '',
-            ]
-        ];
+    private $gamePlayerService;
 
-        return $vars;
+    public function __construct(
+        Request $request,
+        \Model\Grid\Factory $gridFactory,
+        \Model\Grid\Column\Factory $columnFactory,
+        \Twig_Environment $twig,
+        Factory $filterFactory,
+        \Service\GamePlayer $gamePlayerService,
+        $template = '',
+        array $selectedMenu = [],
+        $pageTitle = ''
+    ) {
+        $this->gamePlayerService = $gamePlayerService;
+        parent::__construct(
+            $request,
+            $gridFactory,
+            $columnFactory,
+            $twig,
+            $filterFactory,
+            $template,
+            $selectedMenu,
+            $pageTitle
+        );
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    protected function getFilters()
+    protected function getFilterKeys()
     {
-        return $this->request->get('search', null);
+        return [
+            Factory::PLAYER_FILTER,
+            Factory::WONDER_FILTER,
+            Factory::SIDE_FILTER,
+            Factory::NUMBER_FILTER
+        ];
     }
 
     /**
      * @return string
      */
-    protected function getGridTitle()
+    private function getGridTitle()
     {
         return 'Stats';
     }
 
     /**
-     * @param $key
      * @return bool
      */
-    protected function isSpecificFilter($key)
+    private function canShowPlayerColumn()
     {
-        $filters = $this->getFilters();
-        return (isset($filters[$key]) && is_array($filters[$key]) && count($filters) > 0);
+        return $this->isGroupBy('player_id');
     }
 
     /**
      * @return bool
      */
-    protected function canShowPlayerColumn()
+    private function canShowWonderColumn()
     {
-        return $this->isSpecificFilter('player_id');
+        return $this->isGroupBy('wonder_id');
     }
 
     /**
      * @return bool
      */
-    protected function canShowWonderColumn()
+    private function canShowPlayerCountColumn()
     {
-        return $this->isSpecificFilter('wonder_id');
+        return $this->isGroupBy('player_count');
     }
 
     /**
      * @return bool
      */
-    protected function canShowSideColumn()
+    private function canShowSideColumn()
     {
-        return $this->isSpecificFilter('side');
+        return $this->isGroupBy('side');
     }
 
     /**
      * @return bool
      */
-    protected function canShowWins()
+    private function canShowWins()
     {
         return $this->canShowPlayerColumn() || $this->canShowWonderColumn() || $this->canShowSideColumn();
     }
@@ -123,7 +116,7 @@ class Wonder extends ReportController
         }
 
         if ($this->grid === null) {
-            $grid = new Grid([
+            $grid = $this->gridFactory->create([
                 'emptyMessage' => 'There is no data so far for this report',
                 'id' => 'stats',
                 'title' => $this->getGridTitle(),
@@ -131,7 +124,7 @@ class Wonder extends ReportController
             ]);
             if ($this->canShowPlayerColumn()) {
                 $grid->addColumn(
-                    new Grid\Column\Text([
+                    $this->columnFactory->create([
                         'index' => 'player_name',
                         'label' => 'Player'
                     ])
@@ -139,7 +132,7 @@ class Wonder extends ReportController
             }
             if ($this->canShowWonderColumn()) {
                 $grid->addColumn(
-                    new Grid\Column\Text([
+                    $this->columnFactory->create([
                         'index' => 'wonder_name',
                         'label' => 'Wonder'
                     ])
@@ -148,21 +141,32 @@ class Wonder extends ReportController
 
             if ($this->canShowSideColumn()) {
                 $grid->addColumn(
-                    new Grid\Column\Text([
+                    $this->columnFactory->create([
                         'index' => 'side',
                         'label' => 'Side'
                     ])
                 );
             }
+            if ($this->canShowPlayerCountColumn()) {
+                $grid->addColumn(
+                    $this->columnFactory->create([
+                        'type' => 'integer',
+                        'index' => 'player_count',
+                        'label' => '# of Players'
+                    ])
+                );
+            }
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'played',
                     'label' => 'Games Played',
                 ])
             );
             if ($this->canShowWins()) {
                 $grid->addColumn(
-                    new Grid\Column\IntegerColumn([
+                    $this->columnFactory->create([
+                        'type' => 'integer',
                         'index' => 'won',
                         'label' => 'Games Won',
                         'defaultSort' => true,
@@ -170,7 +174,8 @@ class Wonder extends ReportController
                     ])
                 );
                 $grid->addColumn(
-                    new Grid\Column\Percentage([
+                    $this->columnFactory->create([
+                        'type' => 'percentage',
                         'index' => 'percentage',
                         'label' => 'Win %',
                         'defaultSort' => true,
@@ -179,25 +184,29 @@ class Wonder extends ReportController
                 );
             }
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'total_points',
                     'label' => 'Total Points',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\DecimalColumn([
+                $this->columnFactory->create([
+                    'type' => 'decimal',
                     'index' => 'average',
                     'label' => 'Average',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'max',
                     'label' => 'Max Points',
                 ])
             );
             $grid->addColumn(
-                new Grid\Column\IntegerColumn([
+                $this->columnFactory->create([
+                    'type' => 'integer',
                     'index' => 'min',
                     'label' => 'Min Points',
                 ])
@@ -213,45 +222,26 @@ class Wonder extends ReportController
      *
      * @return array
      */
-    protected function getRows()
+    private function getRows()
     {
-        $gamePlayers = \Wonders\GamePlayerQuery::create();
+        $queryFilters = [];
         $filters = $this->getFilters();
         if ($this->isSpecificFilter('player_id')) {
-            $gamePlayers->filterByPlayerId($filters['player_id'], Criteria::IN);
+            $queryFilters['PlayerId'] = [$filters['player_id'], Criteria::IN];
         }
         if ($this->isSpecificFilter('wonder_id')) {
-            $gamePlayers->filterByWonderId($filters['wonder_id'], Criteria::IN);
+            $queryFilters['WonderId'] = [$filters['wonder_id'], Criteria::IN];
         }
         if ($this->isSpecificFilter('side')) {
-            $gamePlayers->filterBySide($filters['side'], Criteria::IN);
+            $queryFilters['Side'] = [$filters['side'], Criteria::IN];
         }
-        if (isset($filters['date']['start']) && !empty($filters['date']['start'])) {
-            $gamePlayers->useGameQuery()
-                ->filterByDate($filters['date']['start'], Criteria::GREATER_EQUAL)
-                ->endUse();
-        }
-        if (isset($filters['date']['end']) && !empty($filters['date']['end'])) {
-            $gamePlayers->useGameQuery()
-                ->filterByDate($filters['date']['end'], Criteria::LESS_EQUAL)
-                ->endUse();
+        if (isset($filters['date'])) {
+            $queryFilters['_game']['date'] = $filters['date'];
         }
         if (isset($filters['player_count']) && !empty($filters['player_count'])) {
-            $gamePlayers->useGameQuery()
-                ->filterByPlayerCount($filters['player_count'], Criteria::IN)
-                ->endUse();
+            $queryFilters['_game']['player_count'] = [$filters['player_count'], Criteria::IN];
         }
-        $players = $this->getPlayers();
-        $playersById = [];
-        foreach ($players as $player) {
-            $playersById[$player['value']] = $player['label'];
-        }
-
-        $wonders = $this->getWonders();
-        $wondersById = [];
-        foreach ($wonders as $wonder) {
-            $wondersById[$wonder['value']] = $wonder['label'];
-        }
+        $gamePlayers = $this->gamePlayerService->getGamePlayers($queryFilters);
         $rows = [];
         foreach ($gamePlayers as $gamePlayer) {
             /** @var GamePlayer $gamePlayer */
@@ -259,16 +249,20 @@ class Wonder extends ReportController
             if (!isset($rows[$key])) {
                 $initRow = [];
                 if ($this->canShowPlayerColumn()) {
-                    $initRow['player_name'] = $playersById[$gamePlayer->getPlayerId()];
+                    $initRow['player_name'] = $gamePlayer->getPlayer()->getName();
                 }
                 if ($this->canShowWonderColumn()) {
-                    $initRow['wonder_name'] = $wondersById[$gamePlayer->getWonderId()];
+                    $wonder = $gamePlayer->getWonder();
+                    $initRow['wonder_name'] = ($wonder) ? $wonder->getName() : '-- Not set --';
                 }
                 if ($this->canShowSideColumn()) {
                     $initRow['side'] = $gamePlayer->getSide();
                 }
                 if ($this->canShowWins()) {
                     $initRow['won'] = 0;
+                }
+                if ($this->canShowPlayerCountColumn()) {
+                    $initRow['player_count'] = $gamePlayer->getGame()->getPlayerCount();
                 }
                 $initRow['played'] = 0;
                 $initRow['total_points'] = 0;
@@ -307,75 +301,21 @@ class Wonder extends ReportController
      * @param GamePlayer $row
      * @return string
      */
-    protected function getRowKey(GamePlayer $row)
+    private function getRowKey(GamePlayer $row)
     {
         $keyParts = ['_'];
-        if ($this->isSpecificFilter('player_id')) {
+        if ($this->isGroupBy('player_id')) {
             $keyParts[] = $row->getPlayerId();
         }
-        if ($this->isSpecificFilter('wonder_id')) {
+        if ($this->isGroupBy('wonder_id')) {
             $keyParts[] = $row->getWonderId();
         }
-        if ($this->isSpecificFilter('side')) {
+        if ($this->isGroupBy('side')) {
             $keyParts[] = $row->getSide();
         }
+        if ($this->isGroupBy('player_count')) {
+            $keyParts[] = $row->getGame()->getPlayerCount();
+        }
         return implode('_', $keyParts);
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getPlayers()
-    {
-        if (!isset($this->cache['players'])) {
-            $players = PlayerQuery::create()->orderByName()->find();
-            $values = [];
-            foreach ($players as $player) {
-                $values[] = [
-                    'label' => $player->getName(),
-                    'value' => $player->getId()
-                ];
-            }
-            $this->cache['players'] = $values;
-        }
-        return $this->cache['players'];
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getWonders()
-    {
-        if (!isset($this->cache['wonders'])) {
-            $wonders = WonderQuery::create()->orderByName()->find();
-            $values = [];
-            foreach ($wonders as $wonder) {
-                $values[] = [
-                    'label' => $wonder->getName(),
-                    'value' => $wonder->getId()
-                ];
-            }
-            $this->cache['wonders'] = $values;
-        }
-        return $this->cache['wonders'];
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getSides()
-    {
-        if (!isset($this->cache['sides'])) {
-            $sideModel = new Side();
-            $values = [];
-            foreach ($sideModel->getSides() as $side) {
-                $values[] = [
-                    'label' => $side['name'],
-                    'value' => $side['id']
-                ];
-            }
-            $this->cache['sides'] = $values;
-        }
-        return $this->cache['sides'];
     }
 }

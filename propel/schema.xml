@@ -145,11 +145,47 @@
         <foreign-key foreignTable="game" name="FK_SCORE_GAME_ID">
             <reference local="game_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="wonder" name="FK_SCORE_CATEGORY_ID">
+        <foreign-key foreignTable="category" name="FK_SCORE_CATEGORY_ID">
             <reference local="category_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="player" name="FK_SCORE_PLAYER_ID">
             <reference local="player_id" foreign="id"/>
+        </foreign-key>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="wonder_group" phpName="WonderGroup" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
+        <index name="IDX_WONDER_GROUP_NAME">
+            <index-column name="name"/>
+        </index>
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+    </table>
+    <table name="wonder_group_wonder" phpName="WonderGroupWonder" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="wonder_group_id" phpName="WonderGroupId" type="INTEGER" size="10" required="true"/>
+        <column name="wonder_id" phpName="WonderId" type="INTEGER" size="10" required="true"/>
+        <index name="IDX_WONDER_GROUP_WONDER_WONDER_GROUP_ID">
+            <index-column name="wonder_group_id"/>
+        </index>
+        <index name="IDX_WONER_GROUP_WONDER_ID">
+            <index-column name="wonder_id"/>
+        </index>
+        <unique name="WONDER_GROUP_WONDER_UNIQUE">
+            <unique-column name="wonder_group_id"/>
+            <unique-column name="wonder_id"/>
+        </unique>
+        <foreign-key foreignTable="wonder_group" name="FK_WONDER_GROUP_WONDER_WONDER_GROUP_ID">
+            <reference local="wonder_group_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="wonder" name="FK_WONDER_GROUP_WONDER_WONDER_ID">
+            <reference local="wonder_id" foreign="id"/>
         </foreign-key>
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB"/>

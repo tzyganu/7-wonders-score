@@ -1,14 +1,14 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div>
-        <a href="{{ url('wonder/list')}}" class="btn btn-primary">Wonder List</a>
-    </div>
     <form id="wonder-form" action="{{ url('wonder/save') }}" method="post">
         <input type="hidden" name="id" value="{{ wonder.getId() }}" />
         <div class="box box-default">
             <div class="box-header with-border">
-                <h3 class="box-title">Wonder</h3>
+                <h3 class="box-title">{{ page_title }}</h3>
+                <div class="pull-right">
+                    <a href="{{ url('wonder/list')}}" class="btn btn-primary">Wonder List</a>
+                </div>
             </div>
             <div class="box-body">
                 <div class="row">

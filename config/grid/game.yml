@@ -1,0 +1,79 @@
+options:
+  emptyMessage: There are no games. Start playing.
+  id: games
+  title: Games
+columns:
+  id:
+    type: integer
+    index: id
+    label: Id
+  date:
+    type: text
+    index: date
+    label: Date
+    defaultSort: true
+    defaultSortDir: DESC
+  player_count:
+    type: integer
+    index: player_count
+    label: '# Players'
+  player_name:
+    type: text
+    index: player_names
+    label: Players
+  winner:
+    type: text
+    index: winner
+    label: 'Winner'
+  winner:
+    type: integer
+    index: total
+    label: Total points
+  average:
+    type: decimal
+    index: average
+    label: Average poitns
+  edit:
+    type: link
+    index: id
+    label: View
+    url: 'game/view'
+    sortable: false
+    params:
+      id: id
+buttons:
+  new-8:
+    label: 8
+    url: 'game/new'
+    params:
+      players: 8
+  new-7:
+    label: 7
+    url: 'game/new'
+    params:
+      players: 7
+  new-6:
+    label: 6
+    url: 'game/new'
+    params:
+      players: 6
+  new-5:
+    label: 5
+    url: 'game/new'
+    params:
+      players: 5
+  new-4:
+    label: 4
+    url: 'game/new'
+    params:
+      players: 4
+  new-3:
+    label: 3
+    url: 'game/new'
+    params:
+      players: 3
+  new:
+    label: Add new Game
+    url: 'game/new'
+
+

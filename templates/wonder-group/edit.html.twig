@@ -1,0 +1,45 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <form id="wonder-group-form" action="{{ url('wonder-group/save') }}" method="post">
+        <input type="hidden" name="id" value="{{ wonderGroup.id|default('') }}" />
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">{{ page_title }}</h3>
+                <div class="pull-right">
+                    <a href="{{ url('wonder-group/list')}}" class="btn btn-primary">Wonder Group List</a>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ wonderGroup.getName() }}" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Wonders</label>
+                            <select class="form-control" id="wonders" name="wonders[]" multiple>
+                                {% for wonder in wonders %}
+                                    <option value="{{ wonder.getId() }}" {% if wonder.getId() in selected %} selected="selected" {% endif %}>{{ wonder.getName() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-info">Submit</button>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            $('select').select2();
+        });
+    </script>
+{% endblock %}

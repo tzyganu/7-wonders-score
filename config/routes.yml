@@ -1,221 +1,196 @@
 home:
   controller: \Controller\IndexController
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Dashboard
   bind: /
 #PLAYERS
 player_list:
   controller: \Controller\Player\ListPlayer
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
+  pageTitle: Players list
+  selectedMenu:
+    - players
+    - players-list
+  template: default.html.twig
   method: get
-  page_title: Players List
   bind: player/list
 player_new:
   controller: \Controller\Player\EditPlayer
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Add new player
+  template: player/edit.html.twig
+  selectedMenu:
+    - players
+    - players-new
   bind: player/new
 player_edit:
   controller: \Controller\Player\EditPlayer
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Edit Player
+  template: player/edit.html.twig
+  selectedMenu:
+    - players
   bind: player/edit
 player_save:
   controller: \Controller\Player\SavePlayer
-  dependencies:
-    - request
-    - session
   method: post
   bind: player/save
 
 #SCORE CATEGORIES
 category_list:
   controller: \Controller\Category\ListCategory
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
+  pageTitle: Score Categories list
+  selectedMenu:
+    - categories
+    - categories-list
+  template: default.html.twig
   method: get
-  page_title: Score categories list
   bind: category/list
 
 category_new:
   controller: \Controller\Category\EditCategory
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Add new score category
+  template: category/edit.html.twig
+  selectedMenu:
+    - categories
+    - categories-new
   bind: category/new
 category_edit:
   controller: \Controller\Category\EditCategory
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Edit score category
+  template: category/edit.html.twig
+  selectedMenu:
+    - categories
   bind: category/edit
 category_save:
   controller: \Controller\Category\SaveCategory
-  dependencies:
-    - request
-    - session
   method: post
   redirect: /category/list
   bind: category/save
+
 # WONDERS
 wonder_list:
   controller: \Controller\Wonder\ListWonder
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
+  pageTitle: Wonder list
+  selectedMenu:
+    - wonders
+    - wonders-list
+  template: default.html.twig
   page_title: Wonders List
   bind: wonder/list
 wonder_new:
   controller: \Controller\Wonder\EditWonder
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Add new Wonder
+  template: wonder/edit.html.twig
+  selectedMenu:
+    - wonders
+    - wonders-new
   bind: wonder/new
 wonder_edit:
   controller: \Controller\Wonder\EditWonder
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
+  template: wonder/edit.html.twig
+  selectedMenu:
+    - wonders
   method: get
-  page_title: Edit Wonder
   bind: wonder/edit
 wonder_save:
   controller: \Controller\Wonder\SaveWonder
-  dependencies:
-    - request
-    - session
   method: post
   bind: wonder/save
+
+wonder_group_list:
+  controller: \Controller\WonderGroup\ListWonderGroup
+  method: get
+  pageTitle: Wonder Group list
+  selectedMenu:
+    - wonders
+    - wonders-group-list
+  template: default.html.twig
+  bind: wonder-group/list
+wonder_group_new:
+  controller: \Controller\WonderGroup\EditWonderGroup
+  method: get
+  template: wonder-group/edit.html.twig
+  selectedMenu:
+    - wonders
+    - wonders-group-new
+  bind: wonder-group/new
+wonder_group_edit:
+  controller: \Controller\WonderGroup\EditWonderGroup
+  template: wonder-group/edit.html.twig
+  selectedMenu:
+    - wonders
+  method: get
+  bind: wonder-group/edit
+wonder_group_save:
+  controller: \Controller\WonderGroup\SaveWonderGroup
+  method: post
+  bind: wonder-group/save
 
 # GAME
 game_list:
   controller: \Controller\Game\ListGame
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Games list
+  pageTitle: Games list
+  selectedMenu:
+    - games
+    - games-list
+  template: default.html.twig
   bind: game/list
 game_view:
   controller: \Controller\Game\ViewGame
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: View Game Scores
+  template: default.html.twig
+  pageTitle: View Game Scores
+  selectedMenu:
+    - games
   bind: game/view
 game_new:
   controller: \Controller\Game\NewGame
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
+  template: game/new.html.twig
+  selectedMenu:
+    - games
+    - games-new
   method: get
-  page_title: Add new game score
+  pageTitle: Add new game score
   bind: game/new
 game_save:
   controller: \Controller\Game\SaveGame
-  dependencies:
-    - request
-    - session
   method: post
   redirect: /game/list
   bind: game/save
 login:
   controller: \Controller\Login\Index
   template: login/index.html.twig
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
+  pageTitle: Login
   method: get
   bind: login
 login_post:
   controller: \Controller\Login\Post
-  dependencies:
-    - request
-    - session
-    - hash
   method: post
   bind: login/post
 logout:
   controller: \Controller\Login\Logout
-  dependencies:
-    - request
-    - session
   method: get
   bind: logout
 
 #REPORTS
 report_wonder:
   controller: \Controller\Report\Stats\Wonder
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
+  template: report.html.twig
+  selectedMenu:
+    - reports
+    - reports-wonder
   method: get
-  page_title: Wonder stats
+  pageTitle: Wonder stats
   bind: report/wonder
 report_category:
   controller: \Controller\Report\Stats\Category
-  dependencies:
-    - request
-    - session
-    - menuBuilder
-    - twig
   method: get
-  page_title: Category stats
+  template: report.html.twig
+  selectedMenu:
+    - reports
+    - reports-category
+  pageTitle: Category stats
   bind: report/category
 heartbeat:
-  controller: \Controller\HeartbeatController
-  dependencies:
-    - request
-    - session
+  controller: \Controller\Heartbeat
   method: get
   bind: heartbeat
