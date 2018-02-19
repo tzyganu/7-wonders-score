@@ -1,0 +1,175 @@
+{% extends "layout.html.twig" %}
+{% block head %}
+    <script type="text/javascript" src="{{ asset('highcharts/highcharts.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('highcharts/exporting.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">{{ page_title }}</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            {{ basic_stats|raw }}
+        </div>
+    </div>
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">Wonders & Score Categories</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-lg-6 col-sm-12">
+                    <div id="category-chart" style="height: 300px;"></div>
+                </div>
+                <div class="col-lg-6 col-sm-12">
+                    <div id="wonder-chart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for rank, data in categories_rank %}
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ranked {{ rank }}</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div id="line-chart-{{ rank }}" style="height: 450px;"></div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
+{% block footer %}
+<script type="text/javascript">
+    Highcharts.chart('category-chart', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Points per score category'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Score Categories',
+            colorByPoint: true,
+            data: {{ category_basic|json_encode|raw }}
+        }]
+    });
+
+    Highcharts.chart('wonder-chart', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Points by wonder'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Wonders',
+            colorByPoint: true,
+            data: {{ wonder_basic|json_encode|raw }}
+        }]
+    });
+
+    {% for rank, rankData in categories_rank %}
+    Highcharts.chart('line-chart-{{ rank }}', {
+        chart: {
+            type: 'column',
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'When Ranked {{ rank }}'
+        },
+        xAxis: {
+            categories: {{ rankData.categories|json_encode|raw }},
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Score',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' points'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: {
+            align: 'center',
+            verticalAlign: 'bottom',
+            floating: false,
+            borderWidth: 1,
+            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+            shadow: true,
+            symbolHeight: '0px'
+        },
+        credits: {
+            enabled: false
+        },
+        series: {{ rankData.values|json_encode|raw }}
+    });
+    {% endfor %}
+</script>
+{% endblock %}

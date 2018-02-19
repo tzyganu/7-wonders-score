@@ -62,7 +62,7 @@ class ListGame extends GridController implements ControllerInterface
             $total = 0;
             $winners = [];
             foreach ($game->getGamePlayers() as $gamePlayer) {
-                $name = '<a href="'.$this->urlBuilder->getUrl('player/edit', ['id' => $gamePlayer->getPlayerId()])
+                $name = '<a href="'.$this->urlBuilder->getUrl('player/view', ['id' => $gamePlayer->getPlayerId()])
                     .'">'.$gamePlayer->getPlayer()->getName().'</a>';
                 $playerNames[] = $name;
                 if ($gamePlayer->getPlace() == 1) {

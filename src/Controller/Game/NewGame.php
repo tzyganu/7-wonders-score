@@ -5,6 +5,7 @@ namespace Controller\Game;
 use Controller\AuthInterface;
 use Controller\ControllerInterface;
 use Model\PlayerCount;
+use Model\ScienceScore;
 use Model\Side;
 use Propel\Runtime\Map\TableMap;
 use Service\Player;
@@ -57,6 +58,8 @@ class NewGame implements AuthInterface, ControllerInterface
      */
     private $wonderGroupService;
 
+    private $scienceScore;
+
     /**
      * NewGame constructor.
      * @param Request $request
@@ -78,6 +81,7 @@ class NewGame implements AuthInterface, ControllerInterface
         \Twig_Environment $twig,
         Side $side,
         WonderGroup $wonderGroupService,
+        ScienceScore $scienceScore,
         $template = '',
         $selectedMenu = [],
         $pageTitle = ''
@@ -89,6 +93,7 @@ class NewGame implements AuthInterface, ControllerInterface
         $this->twig                 = $twig;
         $this->side                 = $side;
         $this->wonderGroupService   = $wonderGroupService;
+        $this->scienceScore         = $scienceScore;
         $this->template             = $template;
         $this->selectedMenu         = $selectedMenu;
         $this->pageTitle            = $pageTitle;
@@ -130,6 +135,11 @@ class NewGame implements AuthInterface, ControllerInterface
         return $wonders;
     }
 
+    private function getScienceScoreHtml()
+    {
+        return $this->scienceScore->getGridHtml();
+    }
+
     /**
      * @return string
      */
@@ -149,7 +159,8 @@ class NewGame implements AuthInterface, ControllerInterface
                 'max_players' => PlayerCount::MAX_PLAYERS,
                 'default_players' => $this->getDefaultPlayers(),
                 'page_title' => $this->pageTitle,
-                'selectedMenu' => $this->selectedMenu
+                'selectedMenu' => $this->selectedMenu,
+                'scienceScore' => $this->getScienceScoreHtml()
             ]
         );
     }
