@@ -80,6 +80,7 @@ class SaveCategory implements AuthInterface, ControllerInterface
             $category->setSortOrder($this->request->get('sort_order'));
             $category->setOptional($this->request->get('optional'));
             $category->setIconClass($this->request->get('icon_class'));
+            $category->setColor($this->request->get('color'));
             $this->categoryService->save($category);
             $this->flashMessage->addSuccessMessage("The score category was saved");
             return $this->responseFactory->create(

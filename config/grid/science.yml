@@ -1,0 +1,19 @@
+options:
+  emptyMessage: No score so far
+  id: science-score
+  title: Science Score
+  pagingValues:
+    - 14
+    - 28
+    - 42
+    - 56
+    - 70
+columns:
+  id:
+    type: text
+    index: symbol
+    label: Number of symbols
+  score:
+    type: integer
+    index: score
+    label: Score

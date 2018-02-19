@@ -27,6 +27,7 @@
         <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
         <column name="sort_order" phpName="SortOrder" type="INTEGER" size="10" required="false" />
         <column name="icon_class" phpName="IconClass" type="VARCHAR" size="100" required="false"/>
+        <column name="color" phpName="Color" type="VARCHAR" size="10" required="false"/>
         <column name="optional" phpName="Optional" type="TINYINT" size="4"/>
         <index name="IDX_CATEGORY_NAME">
             <index-column name="name"/>

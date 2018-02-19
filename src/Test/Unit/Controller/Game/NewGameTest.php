@@ -2,6 +2,7 @@
 namespace Test\Unit\Controller\Game;
 
 use Controller\Game\NewGame;
+use Model\ScienceScore;
 use Model\Side;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -44,6 +45,10 @@ class NewGameTest extends TestCase
      */
     private $wonderGroupService;
     /**
+     * @var ScienceScore | MockObject
+     */
+    private $scienceScore;
+    /**
      * @var NewGame | MockObject
      */
     private $controller;
@@ -61,6 +66,7 @@ class NewGameTest extends TestCase
         $this->wonderService      = $this->createMock(Wonder::class);
         $this->side               = $this->createMock(Side::class);
         $this->wonderGroupService = $this->createMock(WonderGroup::class);
+        $this->scienceScore       = $this->createMock(ScienceScore::class);
         $this->controller         = new NewGame(
             $this->request,
             $this->categoryService,
@@ -68,7 +74,8 @@ class NewGameTest extends TestCase
             $this->wonderService,
             $this->twig,
             $this->side,
-            $this->wonderGroupService
+            $this->wonderGroupService,
+            $this->scienceScore
         );
     }
 
@@ -84,6 +91,7 @@ class NewGameTest extends TestCase
         $this->wonderService      = null;
         $this->side               = null;
         $this->wonderGroupService = null;
+        $this->scienceScore       = null;
         $this->controller         = null;
         parent::tearDown();
     }

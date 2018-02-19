@@ -20,6 +20,14 @@ columns:
     sortable: false
     params:
       id: getId
+  view:
+    type: link
+    index: getId
+    label: View Stats
+    url: 'player/view'
+    sortable: false
+    params:
+      id: getId
 buttons:
   new:
     label: Add new Player

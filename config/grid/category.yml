@@ -25,6 +25,10 @@ columns:
     type: yesno
     index: getOptional
     label: Optional
+  color:
+    type: text
+    index: getColor
+    label: Color
   edit:
     type: link
     index: getId

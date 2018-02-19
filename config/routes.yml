@@ -27,6 +27,13 @@ player_edit:
   selectedMenu:
     - players
   bind: player/edit
+player_view:
+  controller: \Controller\Player\ViewPlayer
+  method: get
+  template: player/view.html.twig
+  selectedMenu:
+    - players
+  bind: player/view
 player_save:
   controller: \Controller\Player\SavePlayer
   method: post
